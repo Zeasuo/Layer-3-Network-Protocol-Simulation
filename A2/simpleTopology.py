@@ -4,8 +4,6 @@ from mininet.node import Node
 from mininet.log import setLogLevel, info
 from mininet.cli import CLI
 
-from router import MyRouter
-
 
 class SimpleTopo(Topo):
     """
