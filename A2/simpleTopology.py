@@ -41,10 +41,5 @@ class SimpleTopo(Topo):
         self.addLink(h4, s2)
 
 
-def run():
-    topo = SimpleTopo()
-    net = Mininet(topo=topo)
-    w
-
 
 topos = {'mytopo': (lambda: SimpleTopo())}
