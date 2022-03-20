@@ -22,7 +22,7 @@ class SimpleTopo(Topo):
     def build(self, **_opts):
 
         # Add hosts and switches
-        r1 = self.addHost('r1', cls=MyRouter, ip='10.0.0.1/24')
+        r1 = self.addHost('r1', ip='10.0.0.1/24')
         h1 = self.addHost('h1', defaultRoute='via 10.0.0.1')
         h2 = self.addHost('h2', defaultRoute='via 10.0.0.1')
         h3 = self.addHost('h3', defaultRoute='via 10.100.0.1')
