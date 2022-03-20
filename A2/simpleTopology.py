@@ -21,10 +21,10 @@ class SimpleTopo(Topo):
 
         # Add hosts and switches
         r1 = self.addHost('r1', ip='10.10.0.1/24')
-        h1 = self.addHost('h1', defaultRoute='via 10.0.0.1')
-        h2 = self.addHost('h2', defaultRoute='via 10.0.0.2')
-        h3 = self.addHost('h3', defaultRoute='via 10.100.0.1')
-        h4 = self.addHost('h4', defaultRoute='via 10.100.0.1')
+        h1 = self.addHost('h1')
+        h2 = self.addHost('h2')
+        h3 = self.addHost('h3')
+        h4 = self.addHost('h4')
         s1 = self.addSwitch('s1')
         s2 = self.addSwitch('s2')
 
