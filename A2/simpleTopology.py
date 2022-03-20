@@ -4,28 +4,29 @@ from mininet.node import Node
 from mininet.log import setLogLevel, info
 from mininet.cli import CLI
 
-"""
-A simple topology to test simple router
-                   r1
-                  |  \
-                 |    \
-                s1    s2
-              /   \   /  \
-             h1   h2 h3   h4
-The ip address of hosts and interfaces in this topology is static.
-"""
+
 
 
 class SimpleTopo(Topo):
+    """
+        A simple topology to test simple router
+                           r1
+                          |  \
+                         |    \
+                        s1    s2
+                      /   \   /  \
+                     h1   h2 h3   h4
+        The ip address of hosts and interfaces in this topology is static.
+    """
     def __init__(self, **params):
         Topo.__init__(self)
 
         # Add hosts and switches
         r1 = self.addHost('r1', ip='10.1.0.1/24')
-        h1 = self.addHost('h1', ip='10.1.0.1')
-        h2 = self.addHost('h2', ip='10.1.0.2')
-        h3 = self.addHost('h3', ip="10.100.0.1")
-        h4 = self.addHost('h4', ip="10.100.0.2")
+        h1 = self.addHost('h1', ip='10.1.0.251')
+        h2 = self.addHost('h2', ip='10.1.0.252')
+        h3 = self.addHost('h3', ip="10.100.0.251")
+        h4 = self.addHost('h4', ip="10.100.0.252")
         s1 = self.addSwitch('s1')
         s2 = self.addSwitch('s2')
 
