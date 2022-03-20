@@ -1,6 +1,6 @@
 from mininet.topo import Topo
 from mininet.net import Mininet
-from mininet.node import Node, Controller
+from mininet.node import Node, Controller, RemoteController
 from mininet.log import setLogLevel, info
 from mininet.cli import CLI
 
@@ -17,11 +17,11 @@ The ip address of hosts and interfaces in this topology is static.
 
 
 def MyTopo():
-    net = Mininet(controller=Controller)
+    net = Mininet(controller=RemoteController)
 
     info('***Adding controller\n')
 
-    net.addController('c0')
+    c0 = net.addController('c0', controller=RemoteController, ip='127.0.0.1', port=6633)
 
     # Add hosts and switches
     r1 = net.addHost('r1', ip='10.1.0.1/24')
@@ -43,13 +43,19 @@ def MyTopo():
     net.addLink(h4, s2)
 
     info('***Starting network\n')
-    net.start()
+    net.build()
 
+    c0.start()
+
+    s1.start([c0])
+
+    s2.start([c0])
     info('***Running CLI\n')
     CLI(net)
 
     info('*** Stopping network')
     net.stop()
+
 
 if __name__ == "__main__":
     setLogLevel('info')
