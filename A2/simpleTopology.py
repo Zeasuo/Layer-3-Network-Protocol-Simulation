@@ -4,28 +4,29 @@ from mininet.node import Node
 from mininet.log import setLogLevel, info
 from mininet.cli import CLI
 
+from router import MyRouter
+
 
 class SimpleTopo(Topo):
     """
     A simple topology to test simple router
-                  router
-                |       \
-               |         \
-              s1         s2
-            /   \       /  \
-           h1   h2     h3   h4
+                   r1
+                  |  \
+                 |    \
+                s1    s2
+              /   \   /  \
+             h1   h2 h3   h4
     The ip address of hosts and interfaces in this topology is static.
     """
 
-    def __init__(self):
-        Topo.__init__(self)
+    def build(self, **_opts):
 
         # Add hosts and switches
-        r1 = self.addHost('r1', ip='10.0.0.1/24')
-        h1 = self.addHost('h1', ip='10.1.0.1/24')
-        h2 = self.addHost('h2', ip='10.1.0.2/24')
-        h3 = self.addHost('h3', ip='10.2.0.1/24')
-        h4 = self.addHost('h4', ip='10.2.0.2/24')
+        r1 = self.addHost('r1', cls=MyRouter, ip='10.0.0.1/24')
+        h1 = self.addHost('h1', defaultRoute='via 10.0.0.1')
+        h2 = self.addHost('h2', defaultRoute='via 10.0.0.1')
+        h3 = self.addHost('h3', defaultRoute='via 10.100.0.1')
+        h4 = self.addHost('h4', defaultRoute='via 10.100.0.1')
         s1 = self.addSwitch('s1')
         s2 = self.addSwitch('s2')
 
@@ -38,6 +39,12 @@ class SimpleTopo(Topo):
 
         self.addLink(h3, s2)
         self.addLink(h4, s2)
+
+
+def run():
+    topo = SimpleTopo()
+    net = Mininet(topo=topo)
+    w
 
 
 topos = {'mytopo': (lambda: SimpleTopo())}
