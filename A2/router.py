@@ -17,7 +17,7 @@ if __name__ == "__main__":
             listen_sockets[intf] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             listen_sockets[intf].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             listen_sockets[intf].setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(intf).encode('utf-8'))
-            listen_sockets[intf].bind((ip, 9000))
+            listen_sockets[intf].bind(('255.255.255.255', 9000))
     print(list(listen_sockets.values()))
     while True:
         input_sockets = list(listen_sockets.values())
