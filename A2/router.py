@@ -15,7 +15,7 @@ if __name__ == "__main__":
         if intf != 'lo':
             ip = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
             listen_sockets[intf] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-            listen_sockets[intf].setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            listen_sockets[intf].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             listen_sockets[intf].setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(intf).encode('utf-8'))
             listen_sockets[intf].bind((ip, 9000))
     print(listen_sockets.values())
