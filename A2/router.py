@@ -17,6 +17,7 @@ if __name__ == "__main__":
             listen_sockets[intf].bind((ip, 9000))
 
     while True:
+        print(listen_sockets.values())
         readable, writable, exceptional = select.select(listen_sockets.values(),
                                                         [],
                                                         [])
