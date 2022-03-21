@@ -24,24 +24,15 @@ if __name__ == "__main__":
 
     router_ip = data.decode()
     connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    connection.connect((router_ip, 9000))
 
     while True:
-        readable, writable, exceptional = select.select([connection], [connection], [])
+        readable, writable, exceptional = select.select([sys.stdin, connection], [], [])
 
-        if readable:
-            message, source = connection.recvfrom(1024)
-            print(data, source)
+        for sock in readable:
+            if sock == connection:
+                message = connection.recv(1024)
+                print(message)
 
-        if writable:
-            message = input("Input your message here: ")
-            destination = input("The destination: ")
-            port = input("Enter the port number of the destination: ")
-            if destination[:len(destination)-3] == subnet_address:
-                writable[0].sendto(str.encode(message), (destination, port))
-            else:
-                data = {'message': message,
-                        'destination': destination,
-                        'port': port}
-                data_string = json.dumps(data)
-                writable[0].sendto(str.encode(data_string), (router_ip, 9000))
+
 

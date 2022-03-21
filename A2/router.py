@@ -48,11 +48,11 @@ if __name__ == "__main__":
                 forwarding_table[address[0]] = interface_ip
                 s.sendto(str.encode(interface_ip), (address[0], address[1]))
 
-            if s.proto == 6:
+            elif s in end_to_end_sockets:
                 new_connection = s.accept()
                 new_connection.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(ip_to_intf[s.getsockname()[0]]).encode('utf-8'))
-                data = new_connection.recv(1024)
-                print(data)
-                new_connection.close()
+                print("connection established")
+
+
 
 
