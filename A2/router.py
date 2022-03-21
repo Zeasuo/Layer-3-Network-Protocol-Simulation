@@ -13,7 +13,7 @@ if __name__ == "__main__":
     for intf in interfaces:
         if intf != 'lo':
             ip = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
-            listen_sockets[intf] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            listen_sockets[intf] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             listen_sockets[intf].bind((ip, 9000))
             listen_sockets[intf].listen(5)
 
