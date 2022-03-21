@@ -37,5 +37,5 @@ if __name__ == "__main__":
         for s in readable:
             if s.proto == 17:
                 data, address = s.recvfrom(1024)
-                print(data, address, s.laddr)
+                print(data, address)
                 print(socket.gethostbyname_ex(s.gethostname()))
