@@ -3,7 +3,9 @@ import netifaces as ni
 
 
 if __name__ == "__main__":
-    listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ni.ifaddresses('eth0')
-    ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
-    print(ip)
+    listen_sockets = {}
+    interfaces = ni.interfaces()
+    for intf in interfaces:
+        if intf != 'lo':
+            ip = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
+            print(ip)
