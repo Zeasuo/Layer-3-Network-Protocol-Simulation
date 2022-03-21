@@ -1,11 +1,6 @@
-from mininet.node import Node
+import socket
 
 
-class MyRouter(Node):
-    def config(self, **params):
-        super(MyRouter, self).config(**params)
-        self.cmd('sysctl net.ipv4.ip_forward=1')
-
-    def terminate(self):
-        self.cmd('sysctl net.ipv4.ip_forward=0')
-        super(MyRouter, self).terminate()
+if __name__ == "__main__":
+    listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    print(socket.gethostbyname(socket.gethostname()))
