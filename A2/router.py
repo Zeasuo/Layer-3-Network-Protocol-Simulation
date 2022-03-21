@@ -18,9 +18,9 @@ if __name__ == "__main__":
             listen_sockets[intf].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             listen_sockets[intf].setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(intf).encode('utf-8'))
             listen_sockets[intf].bind((ip, 9000))
-    print(listen_sockets.values())
+    print(list(listen_sockets.values()))
     while True:
-        input_sockets = listen_sockets.values()
+        input_sockets = list(listen_sockets.values())
         readable, writable, exceptional = select.select(input_sockets,
                                                         [],
                                                         [])
