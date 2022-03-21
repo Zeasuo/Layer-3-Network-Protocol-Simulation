@@ -38,4 +38,4 @@ if __name__ == "__main__":
             if s.proto == 17:
                 data, address = s.recvfrom(1024)
                 print(data, address)
-                print(s.getsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE))
+                print(s.getsockopt(socket.SOL_SOCKET))
