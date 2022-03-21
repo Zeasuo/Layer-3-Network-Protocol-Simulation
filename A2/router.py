@@ -11,6 +11,7 @@ if __name__ == "__main__":
     output_sockets = []
     for intf in interfaces:
         if intf != 'lo':
+            print(ni.ifaddresses(intf)[ni.AF_INET][0])
             ip = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
             listen_sockets[intf] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             listen_sockets[intf].bind((ip, 9000))
@@ -20,6 +21,7 @@ if __name__ == "__main__":
         readable, writable, exceptional = select.select(listen_sockets.values(),
                                                         [],
                                                         [])
+        print("found")
         for s in readable:
             data, address = s.recvfrom(1024)
             print(data, address)
