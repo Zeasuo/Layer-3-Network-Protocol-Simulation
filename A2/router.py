@@ -18,13 +18,15 @@ if __name__ == "__main__":
             listen_sockets[intf].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             listen_sockets[intf].setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(intf).encode('utf-8'))
             listen_sockets[intf].bind((ip, 9000))
+    input_sockets = list(listen_sockets.values())
     print(list(listen_sockets.values()))
     while True:
-        input_sockets = list(listen_sockets.values())
+
         readable, writable, exceptional = select.select(input_sockets,
-                                                        [],
+                                                        output_sockets,
                                                         [])
-        print("found")
         for s in readable:
-            data, address = s.recvfrom(1024)
-            print(data, address)
+            if s.proto == 17:
+                data, address = s.recvfrom(1024)
+                print("This is UDP")
+                print(data, address)
