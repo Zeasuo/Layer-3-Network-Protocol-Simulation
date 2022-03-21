@@ -9,10 +9,10 @@ if __name__ == "__main__":
     listen_sockets = {}
     interfaces = ni.interfaces()
     output_sockets = []
+    # Assign some sockets to all interfaces' broadcast IP
     for intf in interfaces:
         if intf != 'lo':
-            print(ni.ifaddresses(intf)[ni.AF_INET][0])
-            ip = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
+            ip = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
             listen_sockets[intf] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             listen_sockets[intf].bind((ip, 9000))
             listen_sockets[intf].listen(5)
@@ -25,7 +25,3 @@ if __name__ == "__main__":
         for s in readable:
             data, address = s.recvfrom(1024)
             print(data, address)
-
-
-
-
