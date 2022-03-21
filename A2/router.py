@@ -40,7 +40,7 @@ if __name__ == "__main__":
         for s in readable:
             if s.proto == 17:
                 data, address = s.recvfrom(1024)
-                interface_ip = broadcast_to_tcp[s.getsockname()]
+                interface_ip = broadcast_to_tcp[s.getsockname()[0]]
                 forwarding_table[address[0]] = interface_ip
                 s.sendto(interface_ip, (address[0], address[1]))
 
