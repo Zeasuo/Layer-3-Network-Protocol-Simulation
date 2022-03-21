@@ -8,6 +8,7 @@ if __name__ == "__main__":
     # initializing sockets for each interface other than loopback
     listen_sockets = {}
     interfaces = ni.interfaces()
+    input_sockets = []
     output_sockets = []
     # Assign some sockets to all interfaces' broadcast IP
     for intf in interfaces:
@@ -17,11 +18,5 @@ if __name__ == "__main__":
             listen_sockets[intf].bind((ip, 9000))
 
     while True:
-        print(listen_sockets.values())
-        readable, writable, exceptional = select.select(listen_sockets.values(),
-                                                        [],
-                                                        [])
-        print("found")
-        for s in readable:
-            data, address = s.recvfrom(1024)
-            print(data, address)
+        data, address = listen_sockets['r1-eth1'].recvfrom(1024)
+        print(data, address)
