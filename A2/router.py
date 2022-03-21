@@ -38,4 +38,4 @@ if __name__ == "__main__":
             if s.proto == 17:
                 data, address = s.recvfrom(1024)
                 print(data, address)
-                print(socket.gethostbyname_ex(s.gethostname()))
+                print(s.getsockname())
