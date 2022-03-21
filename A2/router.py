@@ -42,5 +42,5 @@ if __name__ == "__main__":
                 data, address = s.recvfrom(1024)
                 interface_ip = broadcast_to_tcp[s.getsockname()[0]]
                 forwarding_table[address[0]] = interface_ip
-                s.sendto(interface_ip, (address[0], address[1]))
+                s.sendto(str.encode(interface_ip), (address[0], address[1]))
 
