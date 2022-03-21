@@ -15,6 +15,11 @@ if __name__ == "__main__":
     s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     # bind the ip address to the socket with port
     s.bind((ip_address, port))
+    # send broadcast message
     s.sendto(initialize_msg, (subnet_address, 9000))
+    # expected to receive reply and know the IP address of the router
+    data, router_ip = s.recvfrom(1024)
     s.close()
+
+    print(data)
 
