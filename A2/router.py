@@ -12,6 +12,8 @@ if __name__ == "__main__":
     input_sockets = []
     output_sockets = []
     broadcast_to_tcp = {}
+    client_connections = []
+    ip_to_intf = {}
     # Assign some sockets to all interfaces' broadcast IP
     for intf in interfaces:
         if intf != 'lo':
@@ -30,6 +32,8 @@ if __name__ == "__main__":
 
             broadcast_to_tcp[ip] = ip2
 
+            ip_to_intf[ip2] = intf
+
     input_sockets = list(listen_sockets.values()) + list(end_to_end_sockets.values())
     print(list(listen_sockets.values()))
     while True:
@@ -43,4 +47,12 @@ if __name__ == "__main__":
                 interface_ip = broadcast_to_tcp[s.getsockname()[0]]
                 forwarding_table[address[0]] = interface_ip
                 s.sendto(str.encode(interface_ip), (address[0], address[1]))
+
+            if s.proto == 6:
+                new_connection = s.accept()
+                new_connection.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(ip_to_intf[s.getsockname()[0]]).encode('utf-8'))
+                data = new_connection.recv(1024)
+                print(data)
+                new_connection.close()
+
 
