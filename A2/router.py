@@ -7,6 +7,7 @@ if __name__ == "__main__":
 
     # initializing sockets for each interface other than loopback
     listen_sockets = {}
+    end_to_end_sockets = {}
     interfaces = ni.interfaces()
     input_sockets = []
     output_sockets = []
@@ -18,7 +19,15 @@ if __name__ == "__main__":
             listen_sockets[intf].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             listen_sockets[intf].setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(intf).encode('utf-8'))
             listen_sockets[intf].bind((ip, 9000))
-    input_sockets = list(listen_sockets.values())
+
+            ip2 = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
+            end_to_end_sockets[intf] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            end_to_end_sockets[intf].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            end_to_end_sockets[intf].setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(intf).encode('utf-8'))
+            end_to_end_sockets[intf].bind((ip2, 9000))
+            end_to_end_sockets[intf].listen(5)
+
+    input_sockets = list(listen_sockets.values()) + list(end_to_end_sockets.values())
     print(list(listen_sockets.values()))
     while True:
 
@@ -28,5 +37,5 @@ if __name__ == "__main__":
         for s in readable:
             if s.proto == 17:
                 data, address = s.recvfrom(1024)
-                print("This is UDP")
                 print(data, address)
+                print(socket.gethostbyname_ex(socket.gethostname()))
