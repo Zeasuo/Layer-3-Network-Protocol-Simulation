@@ -1,6 +1,7 @@
 import socket
 import netifaces as ni
 import select
+import json
 
 forwarding_table = {}
 if __name__ == "__main__":
@@ -62,7 +63,7 @@ if __name__ == "__main__":
                 print("connection established on ip ", client_ip)
 
             if s in client_connections.values():
-                data = s.recv(1024).decode()
+                data = json.loads(s.recv(1024).decode())
                 print(data)
                 destination = data['destination']
                 client_connections[destination].send(data)
