@@ -35,14 +35,14 @@ if __name__ == "__main__":
             ip_to_intf[ip2] = intf
 
     input_sockets = list(listen_sockets.values()) + list(end_to_end_sockets.values())
-    print(list(listen_sockets.values()))
-    print(list(end_to_end_sockets.values()))
+    print(input_sockets)
     while True:
 
         readable, writable, exceptional = select.select(input_sockets,
                                                         output_sockets,
                                                         [])
         for s in readable:
+            print(s)
             if s.proto == 17:
                 data, address = s.recvfrom(1024)
                 interface_ip = broadcast_to_tcp[s.getsockname()[0]]
