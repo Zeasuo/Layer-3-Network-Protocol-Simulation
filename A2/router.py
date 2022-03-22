@@ -9,9 +9,12 @@ if __name__ == "__main__":
     listen_sockets = {}
     end_to_end_sockets = {}
     interfaces = ni.interfaces()
+    # sockets that should be input or output to
     input_sockets = []
     output_sockets = []
+    # dictionary that map broadcast ip to inet addr
     broadcast_to_tcp = {}
+    # dictionary the map client ip address to a specific socket
     client_connections = {}
     ip_to_intf = {}
     # Assign some sockets to all interfaces' broadcast IP
@@ -55,9 +58,10 @@ if __name__ == "__main__":
                 new_connection.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(ip_to_intf[s.getsockname()[0]]).encode('utf-8'))
                 client_connections[client_ip] = new_connection
                 input_sockets.append(new_connection)
+                output_sockets.append(new_connection)
                 print("connection established on ip ", client_ip)
 
-
-
-
-
+            if s in client_connections.values():
+                data, client_ip = s.recvfrom(1024)
+                print("client " + client_ip + " sends data")
+                print(data)

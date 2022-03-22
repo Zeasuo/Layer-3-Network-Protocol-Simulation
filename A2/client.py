@@ -2,10 +2,20 @@ import getopt, sys
 import select
 import socket
 import json
+from threading import Thread
 
 ip_address = None
 
 long_options = ["Initialize", "Send", "Output ="]
+
+def recv(s):
+    while True:
+        data = s.recv(1024).decode()
+        if not data:
+            sys.exit(0)
+        print(data)
+
+
 if __name__ == "__main__":
     ip_address = sys.argv[1]
     port = 9000
@@ -25,15 +35,24 @@ if __name__ == "__main__":
     router_ip = data.decode()
     print(router_ip)
     connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    connection.bind((ip_address, port))
     connection.connect((router_ip, 9000))
 
+    Thread(target=recv(connection)).start()
     while True:
-        readable, writable, exceptional = select.select([sys.stdin, connection], [], [])
+        message = input("Enter Your Message Here: ")
+        destination = input("Input Destination IP Address Here: ")
+        port = input("Input Destination Port Here: ")
 
-        for sock in readable:
-            if sock == connection:
-                message = connection.recv(1024)
-                print(message)
+        if destination[:len(destination)-3] == subnet_address:
+            connection.sendto(str.encode(message), (destination, int(port)))
+
+        else:
+            data = {'message': message,
+                    'destination': destination,
+                    'port': port}
+            data_string = json.dumps(data)
+            connection.send(str.encode(data_string))
 
 
 
