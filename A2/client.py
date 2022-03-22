@@ -2,14 +2,38 @@ import getopt, sys
 import select
 import socket
 import json
+import threading
 from threading import Thread
 
 ip_address = None
 
 long_options = ["Initialize", "Send", "Output ="]
 
-
 if __name__ == "__main__":
+    def recv():
+        while True:
+            data = json.loads(connection.recv(1024).decode())
+            if not data:
+                sys.exit(0)
+            print(data)
+
+    def send():
+        while True:
+
+            message = input("Enter Your Message Here: ")
+            destination = input("Input Destination IP Address Here: ")
+            destination_port = input("Input Destination Port Here: ")
+
+            if destination[:len(destination) - 3] == subnet_address:
+                connection.sendto(str.encode(message), (destination, int(destination_port)))
+
+            else:
+                sent = {'message': message,
+                        'destination': destination,
+                        'port': destination_port}
+                data_string = json.dumps(sent)
+                connection.send(str.encode(data_string))
+
     ip_address = sys.argv[1]
     port = 9000
     subnet_address = ip_address[:len(ip_address)-3]
@@ -27,38 +51,16 @@ if __name__ == "__main__":
 
     router_ip = data.decode()
     print(router_ip)
-    read = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    read.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    read.bind((ip_address, port))
+    connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    connection.bind((ip_address, port))
+    connection.connect((router_ip, 9000))
 
-    write = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    write.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    write.bind((ip_address, port))
-    write.connect((router_ip, 9000))
+    t = threading.Thread(target=recv)
+    t.start()
 
-    while True:
-        readable, writable, exceptional = select.select([read], [write], [])
+    send()
 
-        if read in readable:
-            read.recv(1024)
-            if not data:
-                sys.exit(0)
-            print(data)
 
-        if write in writable:
-            message = input("Enter Your Message Here: ")
-            destination = input("Input Destination IP Address Here: ")
-            port = input("Input Destination Port Here: ")
-
-            if destination[:len(destination)-3] == subnet_address:
-                write.sendto(str.encode(message), (destination, int(port)))
-
-            else:
-                data = {'message': message,
-                        'destination': destination,
-                        'port': port}
-                data_string = json.dumps(data)
-                write.send(str.encode(data_string))
 
 
 
