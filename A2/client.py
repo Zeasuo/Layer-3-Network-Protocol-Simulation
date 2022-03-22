@@ -41,6 +41,8 @@ if __name__ == "__main__":
 
             else:
                 sent = {'message': message,
+                        'source': ip_address,
+                        'source port': port,
                         'destination': destination,
                         'port': destination_port}
                 data_string = json.dumps(sent)
