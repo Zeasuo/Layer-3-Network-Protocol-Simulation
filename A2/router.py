@@ -49,12 +49,15 @@ if __name__ == "__main__":
                 forwarding_table[address[0]] = interface_ip
                 s.sendto(str.encode(interface_ip), (address[0], address[1]))
 
-            elif s in end_to_end_sockets.values():
+            if s in end_to_end_sockets.values():
                 print("new connection come in")
                 new_connection, client_ip = s.accept()
                 new_connection.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(ip_to_intf[s.getsockname()[0]]).encode('utf-8'))
                 client_connections[client_ip] = new_connection
+                input_sockets.append(new_connection)
+                new_connection.send("Hello there")
                 print("connection established on ip ", client_ip)
+
 
 
 
