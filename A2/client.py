@@ -38,7 +38,7 @@ if __name__ == "__main__":
     connection.bind((ip_address, port))
     connection.connect((router_ip, 9000))
 
-    Thread(target=recv(connection)).start()
+
     while True:
         message = input("Enter Your Message Here: ")
         destination = input("Input Destination IP Address Here: ")
@@ -53,6 +53,8 @@ if __name__ == "__main__":
                     'port': port}
             data_string = json.dumps(data)
             connection.send(str.encode(data_string))
+
+    Thread(target=recv(connection)).start()
 
 
 
