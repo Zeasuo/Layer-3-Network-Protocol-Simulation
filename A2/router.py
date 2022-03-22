@@ -64,7 +64,8 @@ if __name__ == "__main__":
                 print("connection established on ip ", client_ip)
 
             if s in client_connections.values():
-                data = json.loads(s.recv(1024).decode())
+                received = s.recv(1024)
+                data = json.loads(received.decode())
                 print(data)
                 destination = data['destination']
                 port = data['port']
