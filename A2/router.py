@@ -67,5 +67,6 @@ if __name__ == "__main__":
                 data = json.loads(s.recv(1024).decode())
                 print(data)
                 destination = data['destination']
-                client_connections[destination].send(data)
+                port = data['port']
+                client_connections[(destination, port)].send(data)
 
