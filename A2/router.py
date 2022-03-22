@@ -12,7 +12,7 @@ if __name__ == "__main__":
     input_sockets = []
     output_sockets = []
     broadcast_to_tcp = {}
-    client_connections = []
+    client_connections = {}
     ip_to_intf = {}
     # Assign some sockets to all interfaces' broadcast IP
     for intf in interfaces:
@@ -51,9 +51,10 @@ if __name__ == "__main__":
 
             elif s in end_to_end_sockets.values():
                 print("new connection come in")
-                new_connection = s.accept()
+                new_connection, client_ip = s.accept()
                 new_connection.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(ip_to_intf[s.getsockname()[0]]).encode('utf-8'))
-                print("connection established")
+                client_connections[client_ip] = new_connection
+                print("connection established on ip ", client_ip)
 
 
 
