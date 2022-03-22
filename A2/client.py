@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
             if destination[:len(destination) - 3] == subnet_address:
                 temp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                temp.bind((ip_address, 9001))
+                temp.bind((ip_address, 9002))
                 temp.connect((destination, 9001))
                 temp.send(message)
                 temp.close()
