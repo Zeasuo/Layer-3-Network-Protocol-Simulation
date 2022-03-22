@@ -36,7 +36,7 @@ if __name__ == "__main__":
                 temp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 temp.bind((ip_address, 9002))
                 temp.connect((destination, 9001))
-                temp.send(message)
+                temp.send(str.encode(message))
                 temp.close()
 
             else:
