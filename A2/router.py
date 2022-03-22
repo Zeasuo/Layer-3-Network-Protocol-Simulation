@@ -55,7 +55,6 @@ if __name__ == "__main__":
                 new_connection.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(ip_to_intf[s.getsockname()[0]]).encode('utf-8'))
                 client_connections[client_ip] = new_connection
                 input_sockets.append(new_connection)
-                new_connection.send("Hello there")
                 print("connection established on ip ", client_ip)
 
 
