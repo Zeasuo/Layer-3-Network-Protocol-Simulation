@@ -28,9 +28,11 @@ if __name__ == "__main__":
     router_ip = data.decode()
     print(router_ip)
     read = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    read.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     read.bind((ip_address, port))
 
     write = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    write.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     write.bind((ip_address, port))
     write.connect((router_ip, 9000))
 
