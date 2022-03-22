@@ -60,6 +60,7 @@ if __name__ == "__main__":
                 client_connections[client_ip] = new_connection
                 input_sockets.append(new_connection)
                 output_sockets.append(new_connection)
+                print(client_connections)
                 print("connection established on ip ", client_ip)
 
             if s in client_connections.values():
