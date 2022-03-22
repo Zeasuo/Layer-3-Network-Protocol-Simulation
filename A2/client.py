@@ -23,6 +23,7 @@ if __name__ == "__main__":
     s.close()
 
     router_ip = data.decode()
+    print(router_ip)
     connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     connection.connect((router_ip, 9000))
 

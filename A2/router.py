@@ -36,6 +36,7 @@ if __name__ == "__main__":
 
     input_sockets = list(listen_sockets.values()) + list(end_to_end_sockets.values())
     print(list(listen_sockets.values()))
+    print(list(end_to_end_sockets.values()))
     while True:
 
         readable, writable, exceptional = select.select(input_sockets,
@@ -49,6 +50,7 @@ if __name__ == "__main__":
                 s.sendto(str.encode(interface_ip), (address[0], address[1]))
 
             elif s in end_to_end_sockets:
+                print("new connection come in")
                 new_connection = s.accept()
                 new_connection.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(ip_to_intf[s.getsockname()[0]]).encode('utf-8'))
                 print("connection established")
