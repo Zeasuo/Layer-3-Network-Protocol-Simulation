@@ -12,20 +12,32 @@ long_options = ["Initialize", "Send", "Output ="]
 if __name__ == "__main__":
     def recv():
         while True:
-            data = json.loads(connection.recv(1024).decode())
-            if not data:
-                sys.exit(0)
-            print(data)
+            readable, writable, exceptional = select.select([connection, subnet_connection_listener], [], [])
+
+            if connection in readable:
+                received = json.loads(connection.recv(1024).decode())
+                if not received:
+                    sys.exit(0)
+                print(received)
+
+            if subnet_connection_listener in readable:
+                temp = subnet_connection_listener.accept()[0]
+                received = temp.recv(1024).decode()
+                print(received)
+                temp.close()
 
     def send():
         while True:
-
             message = input("Enter Your Message Here: ")
             destination = input("Input Destination IP Address Here: ")
             destination_port = input("Input Destination Port Here: ")
 
             if destination[:len(destination) - 3] == subnet_address:
-                connection.sendto(str.encode(message), (destination, int(destination_port)))
+                temp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                temp.bind((ip_address, 9001))
+                temp.connect((destination, 9001))
+                temp.send(message)
+                temp.close()
 
             else:
                 sent = {'message': message,
@@ -54,6 +66,10 @@ if __name__ == "__main__":
     connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     connection.bind((ip_address, port))
     connection.connect((router_ip, 9000))
+
+    subnet_connection_listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    subnet_connection_listener.bind((ip_address, 9001))
+    subnet_connection_listener.listen(5)
 
     t = threading.Thread(target=recv)
     t.start()
