@@ -63,5 +63,5 @@ if __name__ == "__main__":
 
             if s in client_connections.values():
                 data, client_ip = s.recvfrom(1024)
-                print("client " + client_ip + " sends data")
+                print("client " + client_ip[0] + " sends data")
                 print(data)
