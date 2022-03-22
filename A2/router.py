@@ -69,5 +69,5 @@ if __name__ == "__main__":
                 print(data)
                 destination = data['destination']
                 port = data['port']
-                client_connections[(destination, int(port))].send(data)
+                client_connections[(destination, int(port))].send(received)
 
