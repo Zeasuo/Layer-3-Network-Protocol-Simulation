@@ -62,7 +62,8 @@ if __name__ == "__main__":
                 print("connection established on ip ", client_ip)
 
             if s in client_connections.values():
-                data, client_ip = s.recvfrom(1024)
-                print(data, client_ip)
-                print("client " + client_ip[0] + " sends data")
+                data = s.recv(1024).decode()
                 print(data)
+                destination = data['destination']
+                client_connections[destination].send(data)
+
