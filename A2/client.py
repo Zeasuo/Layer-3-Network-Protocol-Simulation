@@ -38,21 +38,29 @@ if __name__ == "__main__":
     connection.bind((ip_address, port))
     connection.connect((router_ip, 9000))
 
-
     while True:
-        message = input("Enter Your Message Here: ")
-        destination = input("Input Destination IP Address Here: ")
-        port = input("Input Destination Port Here: ")
+        readable, writable, exceptional = select.select([connection], [connection], [])
 
-        if destination[:len(destination)-3] == subnet_address:
-            connection.sendto(str.encode(message), (destination, int(port)))
+        if connection in readable:
+            connection.recv(1024)
+            if not data:
+                sys.exit(0)
+            print(data)
 
-        else:
-            data = {'message': message,
-                    'destination': destination,
-                    'port': port}
-            data_string = json.dumps(data)
-            connection.send(str.encode(data_string))
+        if connection in writable:
+            message = input("Enter Your Message Here: ")
+            destination = input("Input Destination IP Address Here: ")
+            port = input("Input Destination Port Here: ")
+
+            if destination[:len(destination)-3] == subnet_address:
+                connection.sendto(str.encode(message), (destination, int(port)))
+
+            else:
+                data = {'message': message,
+                        'destination': destination,
+                        'port': port}
+                data_string = json.dumps(data)
+                connection.send(str.encode(data_string))
 
     Thread(target=recv(connection)).start()
 
