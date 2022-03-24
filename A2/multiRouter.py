@@ -58,18 +58,18 @@ class MultiRouter(Topo):
         self.addLink(h4, s2)
 
         # r2 network links
-        self.addLink(s3, r2, params2={'ip': '10.200.0.1/24'})
-        self.addLink(s4, r2, params2={'ip': '10.300.0.1/24'})
+        self.addLink(s3, r2, intfName2='r2-eth0', params2={'ip': '10.200.0.1/24'})
+        self.addLink(s4, r2, intfName2='r2-eth1', params2={'ip': '10.300.0.1/24'})
         self.addLink(h5, s3)
         self.addLink(h6, s4)
 
         # r3 network links
-        self.addLink(s5, r3, params2={'ip': '10.400.0.1/24'})
+        self.addLink(s5, r3, intfName2='r3-eth0', params2={'ip': '10.400.0.1/24'})
         self.addLink(h7, s5)
 
         # links between routers
-        self.addLink(r1, r2, params1={'ip': '10.101.0.1/24'}, params2={'ip': '10.101.0.2/24'})
-        self.addLink(r1, r3, params1={'ip': '10.102.0.1/24'}, params2={'ip': '10.102.0.2/24'})
+        self.addLink(r1, r2, intfName1='r1-eth2', intftName2='r2-eth2', params1={'ip': '10.101.0.1/24'}, params2={'ip': '10.101.0.2/24'})
+        self.addLink(r1, r3, intfName1='r1-eth3', intftName2='r3-eth1', params1={'ip': '10.102.0.1/24'}, params2={'ip': '10.102.0.2/24'})
 
 
 topos = {'multiRouter': (lambda: MultiRouter())}
