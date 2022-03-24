@@ -1,4 +1,7 @@
 import socket
+import threading
+import time
+
 import netifaces as ni
 import select
 import json
@@ -21,6 +24,7 @@ def advertise():
                                                         [])
         for s in writable:
             s.sendto(str.encode('testing connection from' + s.getsockname()), s.getsockname())
+        time.sleep(5)
 
 if __name__ == "__main__":
     # initializing sockets for each interface other than loopback
@@ -57,6 +61,8 @@ if __name__ == "__main__":
 
     input_sockets = list(listen_sockets.values()) + list(end_to_end_sockets.values())
     print(input_sockets)
+
+    threading.Thread(target=advertise).start()
     while True:
 
         readable, writable, exceptional = select.select(input_sockets,
@@ -88,4 +94,5 @@ if __name__ == "__main__":
                 if (destination, int(port)) not in client_connections:
                     s.send("The destination is unreachable")
                 client_connections[(destination, int(port))].send(received)
+
 
