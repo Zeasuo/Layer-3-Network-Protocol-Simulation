@@ -1,6 +1,3 @@
-from mininet.cli import CLI
-from mininet.log import info
-from mininet.net import Mininet
 from mininet.topo import Topo
 
 
@@ -14,7 +11,7 @@ class MultiRouter(Topo):
                                r3
                               /
                             /
-                           r1 ---------------------r2
+                           r1 -----------s6----------r2
                           |  \                    |  \
                          |    \                  |    \
                         s1    s2                s3    s4
@@ -48,6 +45,9 @@ class MultiRouter(Topo):
         h7 = self.addHost('h7', ip='10.103.0.251/24')
         s5 = self.addSwitch('s5')
 
+        # switches between routers
+        s6 = self.addSwitch('s6')
+
         # Add links based on the above diagram
         # r1 network links
         self.addLink(s1, r1, intfName2='r1-eth0', params2={'ip': '10.1.0.1/24'})
@@ -70,18 +70,8 @@ class MultiRouter(Topo):
         self.addLink(h7, s5)
 
         # links between routers
-        self.addLink(r1, r2, intfName1='r1-eth2', intftName2='r2-eth2', params1={'ip': '10.104.0.1/24'}, params2={'ip': '10.104.0.2/24'})
+        self.addLink(r1, s6, intfName1='r1-eth2', params1={'ip': '10.104.0.1/24'})
+        self.addLink(s6, r2, intftName2='r2-eth2', params2={'ip': '10.104.0.2/24'})
         self.addLink(r1, r3, intfName1='r1-eth3', intftName2='r3-eth1', params1={'ip': '10.105.0.1/24'}, params2={'ip': '10.105.0.2/24'})
-
-def run():
-    topo = MultiRouter()
-    net = Mininet(topo=topo)
-
-    info(net['r1'].cmd("ip route add 10.101.0.0/24 via 10.104.0.2 dev r1-eth2"))
-    info(net['r2'].cmd("ip route add 10.1.0.0/24 via 10.104.0.1 dev r2-eth2"))
-
-    net.start()
-    CLI(net)
-    net.stop()
 
 topos = {'multiRouter': (lambda: MultiRouter())}
