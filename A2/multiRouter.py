@@ -1,3 +1,6 @@
+from mininet.cli import CLI
+from mininet.log import info
+from mininet.net import Mininet
 from mininet.topo import Topo
 
 
@@ -10,14 +13,13 @@ class MultiRouter(Topo):
                                 /
                                r3
                               /
-                            s7
                             /
-                           r1 -----------s6----------r2
-                          |  \                       |  \
-                         |    \                     |    \
-                        s1    s2                   s3    s4
-                      /   \   /  \                 |      \
-                     h1   h2 h3   h4              h5      h6
+                           r1 ---------------------r2
+                          |  \                    |  \
+                         |    \                  |    \
+                        s1    s2                s3    s4
+                      /   \   /  \              |      \
+                     h1   h2 h3   h4           h5      h6
         The ip address of hosts and interfaces in this topology is static.
     """
 
@@ -71,5 +73,15 @@ class MultiRouter(Topo):
         self.addLink(r1, r2, intfName1='r1-eth2', intftName2='r2-eth2', params1={'ip': '10.104.0.1/24'}, params2={'ip': '10.104.0.2/24'})
         self.addLink(r1, r3, intfName1='r1-eth3', intftName2='r3-eth1', params1={'ip': '10.105.0.1/24'}, params2={'ip': '10.105.0.2/24'})
 
+def run():
+    topo = MultiRouter()
+    net = Mininet(topo=topo)
+
+    info(net['r1'].cmd("ip route add 10.101.0.0/24 via 10.104.0.2 dev r1-eth2"))
+    info(net['r2'].cmd("ip route add 10.1.0.0/24 via 10.104.0.1 dev r2-eth2"))
+
+    net.start()
+    CLI(net)
+    net.stop()
 
 topos = {'multiRouter': (lambda: MultiRouter())}
