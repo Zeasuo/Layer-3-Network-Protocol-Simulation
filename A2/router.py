@@ -46,7 +46,6 @@ if __name__ == "__main__":
                                                         output_sockets,
                                                         [])
         for s in readable:
-            print(s)
             if s.proto == 17:
                 data, address = s.recvfrom(1024)
                 interface_ip = broadcast_to_tcp[s.getsockname()[0]]
@@ -69,5 +68,7 @@ if __name__ == "__main__":
                 print(data)
                 destination = data['destination']
                 port = data['port']
+                if (destination, int(port)) not in client_connections:
+                    s.send("The destination is unreachable")
                 client_connections[(destination, int(port))].send(received)
 
