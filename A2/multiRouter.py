@@ -47,8 +47,8 @@ class MultiRouter(Topo):
 
         # Add links based on the above diagram
         # r1 network links
-        self.addLink(s1, r1, intfName2='r1-eth1', params2={'ip': '10.1.0.1/24'})
-        self.addLink(s2, r1, intfName2='r1-eth2', params2={'ip': '10.100.0.1/24'})
+        self.addLink(s1, r1, params2={'ip': '10.1.0.1/24'})
+        self.addLink(s2, r1, params2={'ip': '10.100.0.1/24'})
 
         self.addLink(h1, s1)
         self.addLink(h2, s1)
@@ -57,21 +57,19 @@ class MultiRouter(Topo):
         self.addLink(h4, s2)
 
         # r2 network links
-        self.addLink(s3, r2, intfName2='r2-eth1', params2={'ip': '10.200.0.1/24'})
-        self.addLink(s4, r2, intfName2='r2-eth2', params2={'ip': '10.300.0.1/24'})
+        self.addLink(s3, r2, params2={'ip': '10.200.0.1/24'})
+        self.addLink(s4, r2, params2={'ip': '10.300.0.1/24'})
         self.addLink(h5, s3)
         self.addLink(h6, s4)
 
         # r3 network links
-        self.addLink(s5, r3, intfName2='r3-eth1', params2={'ip': '10.400.0.1/24'})
+        self.addLink(s5, r3, params2={'ip': '10.400.0.1/24'})
         self.addLink(h7, s5)
 
         # links between routers
-        self.addLink(r1, r2, intftName1='r1-eth3', intfName2='r2-eth3',
-                     params1={'ip': '10.101.0.1/24'}, params={'ip': '10.201.0.1/24'})
+        self.addLink(r1, r2, params1={'ip': '10.101.0.1/24'}, params={'ip': '10.201.0.1/24'})
 
-        self.addLink(r1, r3, intftName1='r1-eth4', intfName2='r3-eth2',
-                     params1={'ip': '10.102.0.1/24'}, params={'ip': '10.401.0.1/24'})
+        self.addLink(r1, r3, params1={'ip': '10.102.0.1/24'}, params={'ip': '10.401.0.1/24'})
 
 
 topos = {'multiRouter': (lambda: MultiRouter())}
