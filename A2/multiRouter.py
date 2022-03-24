@@ -10,8 +10,9 @@ class MultiRouter(Topo):
                                 /
                                r3
                               /
+                            s7
                             /
-                           r1 ---------------------r2
+                           r1 -----------s6----------r2
                           |  \                    |  \
                          |    \                  |    \
                         s1    s2                s3    s4
@@ -45,6 +46,10 @@ class MultiRouter(Topo):
         h7 = self.addHost('h7', ip='10.400.0.251/24')
         s5 = self.addSwitch('s5')
 
+        # switches between routers
+        s6 = self.addSwitch('s6')
+        s7 = self.addSwitch('s7')
+
         # Add links based on the above diagram
         # r1 network links
         self.addLink(s1, r1, params2={'ip': '10.1.0.1/24'})
@@ -67,9 +72,8 @@ class MultiRouter(Topo):
         self.addLink(h7, s5)
 
         # links between routers
-        self.addLink(r1, r2, params1={'ip': '10.101.0.1/24'}, params={'ip': '10.201.0.1/24'})
-
-        self.addLink(r1, r3, params1={'ip': '10.102.0.1/24'}, params={'ip': '10.401.0.1/24'})
+        self.addLink(r1, s6, params1={'ip': '10.101.0.1/24'}, params2={'ip': '10.201.0.1/24'})
+        self.addLink(r1, r3, params1={'ip': '10.102.0.1/24'}, params2={'ip': '10.401.0.1/24'})
 
 
 topos = {'multiRouter': (lambda: MultiRouter())}
