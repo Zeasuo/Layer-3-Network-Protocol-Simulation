@@ -13,11 +13,11 @@ class MultiRouter(Topo):
                             s7
                             /
                            r1 -----------s6----------r2
-                          |  \                    |  \
-                         |    \                  |    \
-                        s1    s2                s3    s4
-                      /   \   /  \              |      \
-                     h1   h2 h3   h4           h5      h6
+                          |  \                       |  \
+                         |    \                     |    \
+                        s1    s2                   s3    s4
+                      /   \   /  \                 |      \
+                     h1   h2 h3   h4              h5      h6
         The ip address of hosts and interfaces in this topology is static.
     """
 
@@ -72,8 +72,8 @@ class MultiRouter(Topo):
         self.addLink(h7, s5)
 
         # links between routers
-        self.addLink(r1, s6, params1={'ip': '10.101.0.1/24'}, params2={'ip': '10.201.0.1/24'})
-        self.addLink(r1, r3, params1={'ip': '10.102.0.1/24'}, params2={'ip': '10.401.0.1/24'})
+        self.addLink(r1, r2, params1={'ip': '10.101.0.1/24'}, params2={'ip': '10.101.0.1/24'})
+        self.addLink(r1, r3, params1={'ip': '10.102.0.1/24'}, params2={'ip': '10.102.0.1/24'})
 
 
 topos = {'multiRouter': (lambda: MultiRouter())}
