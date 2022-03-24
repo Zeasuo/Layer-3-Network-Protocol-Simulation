@@ -72,8 +72,8 @@ class MultiRouter(Topo):
         self.addLink(h7, s5)
 
         # links between routers
-        self.addLink(r1, r2, params1={'ip': '10.101.0.1/24'}, params2={'ip': '10.101.0.1/24'})
-        self.addLink(r1, r3, params1={'ip': '10.102.0.1/24'}, params2={'ip': '10.102.0.1/24'})
+        self.addLink(r1, r2, params1={'ip': '10.101.0.1/24'}, params2={'ip': '10.101.0.2/24'})
+        self.addLink(r1, r3, params1={'ip': '10.102.0.1/24'}, params2={'ip': '10.102.0.2/24'})
 
 
 topos = {'multiRouter': (lambda: MultiRouter())}
