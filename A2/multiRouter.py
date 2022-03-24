@@ -72,3 +72,6 @@ class MultiRouter(Topo):
 
         self.addLink(r1, r3, intftName1='r1-eth4', intfName2='r3-eth2',
                      params1={'ip': '10.102.0.1/24'}, params={'ip': '10.401.0.1/24'})
+
+
+topos = {'mytopo': (lambda: MultiRouter())}
