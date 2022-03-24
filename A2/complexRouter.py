@@ -23,7 +23,7 @@ def advertise():
                                                         broadcasts,
                                                         [])
         for s in writable:
-            s.sendto(str.encode('testing connection from' + s.getsockname()), s.getsockname())
+            s.sendto(str.encode('hello'), s.getsockname())
         time.sleep(5)
 
 if __name__ == "__main__":
