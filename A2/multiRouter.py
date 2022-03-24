@@ -1,3 +1,5 @@
+from mininet.net import Mininet
+from mininet.node import RemoteController
 from mininet.topo import Topo
 
 
@@ -25,7 +27,7 @@ class MultiRouter(Topo):
 
         # Add hosts and switches
         # r1 network hosts
-        r1 = self.addHost('r1', ip='10.1.0.1/24', defaultRoute='via 10.104.0.1')
+        r1 = self.addHost('r1', ip='10.1.0.1/24', hostRoute='10.101.0.1 via 10.104.0.1')
         h1 = self.addHost('h1', ip='10.1.0.251/24')
         h2 = self.addHost('h2', ip='10.1.0.252/24')
         h3 = self.addHost('h3', ip="10.100.0.251/24", defaultRoute='via 10.100.0.1')
@@ -72,5 +74,6 @@ class MultiRouter(Topo):
         # links between routers
         self.addLink(r1, r2, intfName1='r1-eth2', intftName2='r2-eth2', params1={'ip': '10.104.0.1/24'}, params2={'ip': '10.104.0.2/24'})
         self.addLink(r1, r3, intfName1='r1-eth3', intftName2='r3-eth1', params1={'ip': '10.105.0.1/24'}, params2={'ip': '10.105.0.2/24'})
+
 
 topos = {'multiRouter': (lambda: MultiRouter())}
