@@ -74,4 +74,4 @@ class MultiRouter(Topo):
                      params1={'ip': '10.102.0.1/24'}, params={'ip': '10.401.0.1/24'})
 
 
-topos = {'mytopo': (lambda: MultiRouter())}
+topos = {'multiRouter': (lambda: MultiRouter())}
