@@ -43,7 +43,7 @@ class MultiRouter(Topo):
         # r3 network host
         r3 = self.addHost('r3', ip='10.400.0.1/24')
         h7 = self.addHost('h7', ip='10.400.0.251/24')
-        s5 = self.addHost('s5')
+        s5 = self.addSwitch('s5')
 
         # Add links based on the above diagram
         # r1 network links
