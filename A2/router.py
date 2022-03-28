@@ -21,6 +21,7 @@ if __name__ == "__main__":
     # Assign some sockets to all interfaces' broadcast IP
     for intf in interfaces:
         if intf != 'lo':
+            print(ni.ifaddresses(intf)[ni.AF_INET])
             ip = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
             listen_sockets[ip] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             listen_sockets[ip].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
