@@ -30,7 +30,8 @@ if __name__ == "__main__":
         while True:
             message = input("Enter Your Message Here: ")
             destination = input("Input Destination IP Address Here: ")
-            destination_port = input("Input Destination Port Here: ")
+            ttl = input("Input TTL Here: ")
+            port = 9000
 
             if destination[:len(destination) - 3] == subnet_address:
                 temp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -44,19 +45,19 @@ if __name__ == "__main__":
                         'source': ip_address,
                         'source port': port,
                         'destination': destination,
-                        'port': destination_port}
+                        'port': port,
+                        'ttl': ttl}
                 data_string = json.dumps(sent)
                 connection.send(str.encode(data_string))
 
     ip_address = sys.argv[1]
-    port = 9000
     subnet_address = ip_address[:len(ip_address)-3]
     print(subnet_address)
     initialize_msg = b'hello'
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     # bind the ip address to the socket with port
-    s.bind((ip_address, port))
+    s.bind((ip_address, 9000))
     # send broadcast message
     s.sendto(initialize_msg, (subnet_address+'255', 9000))
     # expected to receive reply and know the IP address of the router
@@ -66,7 +67,7 @@ if __name__ == "__main__":
     router_ip = data.decode()
     print(router_ip)
     connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    connection.bind((ip_address, port))
+    connection.bind((ip_address, 9000))
     connection.connect((router_ip, 9000))
 
     subnet_connection_listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
