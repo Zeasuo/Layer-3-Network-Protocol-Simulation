@@ -68,9 +68,11 @@ if __name__ == "__main__":
                 data = json.loads(received.decode())
                 print(data)
                 destination = data['destination']
+                ttl = int(data['ttl'])
+                ttl -= 1
                 port = data['port']
                 if (destination, int(port)) not in client_connections:
                     s.send("The destination is unreachable")
-                data['ttl'] -= 1
+                data['ttl'] = ttl
                 client_connections[(destination, int(port))].send(received)
 
