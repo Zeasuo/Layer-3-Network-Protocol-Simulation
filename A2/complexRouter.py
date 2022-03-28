@@ -26,6 +26,11 @@ def advertise():
             s.sendto(str.encode('hello'), s.getsockname())
         time.sleep(5)
 
+
+def get_advertise():
+    pass
+
+
 if __name__ == "__main__":
     # initializing sockets for each interface other than loopback
     listen_sockets = {}
@@ -93,6 +98,5 @@ if __name__ == "__main__":
                 port = data['port']
                 if (destination, int(port)) not in client_connections:
                     s.send("The destination is unreachable")
+                data['ttl'] -= 1
                 client_connections[(destination, int(port))].send(received)
-
-

@@ -70,6 +70,6 @@ if __name__ == "__main__":
                 port = data['port']
                 if (destination, int(port)) not in client_connections:
                     s.send("The destination is unreachable")
-                client_connections[(destination, int(port))].send(received)
                 data['ttl'] -= 1
+                client_connections[(destination, int(port))].send(received)
 
