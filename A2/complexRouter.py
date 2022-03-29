@@ -23,7 +23,7 @@ def advertise():
     while True:
         readable, writable, exceptional = select.select([], broadcasts, [])
         for s in writable:
-            s.sendto(str.encode(forwarding_table), (socket_b_ip[s], 9002))
+            s.sendto(forwarding_table, (socket_b_ip[s], 9002))
         time.sleep(5)
 
 
@@ -43,7 +43,6 @@ def get_advertise():
         r, w, e = select.select(receive_from, [], [])
         for sock in r:
             sourcedata, sourceaddress = sock.recvfrom(1024)
-            receiveddata = sourcedata.decode()
             print(receiveddata)
             for (key, value) in receiveddata.items():
                 forwarding_table[key] = sourceaddress
