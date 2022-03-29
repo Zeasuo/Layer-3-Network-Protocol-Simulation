@@ -29,6 +29,7 @@ def advertise():
         for s in writable:
             s.sendto(str.encode(json.dumps(forwarding_table)),
                      (socket_b_ip[s], 9002))
+        get_advertise()
         time.sleep(5)
 
 
@@ -110,7 +111,7 @@ if __name__ == "__main__":
     print(input_sockets)
 
     threading.Thread(target=advertise).start()
-    threading.Thread(target=get_advertise).start()
+
     while True:
 
         readable, writable, exceptional = select.select(input_sockets,
