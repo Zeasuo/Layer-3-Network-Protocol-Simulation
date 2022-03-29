@@ -56,7 +56,7 @@ def get_advertise():
                 if key not in forwarding_table.keys() \
                         or (key in forwarding_table.keys() and value[1] + 1 <
                             forwarding_table[key][1]):
-                    forwarding_table[key] = sourceaddress
+                    forwarding_table[key] = (sourceaddress[0], value[1]+1)
 
             print("forwarding_table:")
             print(forwarding_table)
