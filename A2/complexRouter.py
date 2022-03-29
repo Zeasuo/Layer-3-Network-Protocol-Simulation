@@ -60,7 +60,6 @@ def get_advertise():
 
         print("forwarding_table:")
         print(forwarding_table)
-    time.sleep(5)
 
 
 if __name__ == "__main__":
@@ -142,6 +141,6 @@ if __name__ == "__main__":
                 destination = data['destination']
                 port = data['port']
                 if (destination, int(port)) not in client_connections:
-                    s.send("The destination is unreachable")
+                    s.send(str.encode("The destination is unreachable"))
                 data['ttl'] -= 1
                 client_connections[(destination, int(port))].send(received)
