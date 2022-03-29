@@ -10,25 +10,43 @@ forwarding_table = {}
 def advertise():
     intfs = ni.interfaces()
     broadcasts = []
+    socket_b_ip = {}
     for intf in intfs:
         if intf != 'lo':
-            ip = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
+            ip = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
             broadcast = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             broadcast.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             broadcast.bind((ip, 9001))
             broadcasts.append(broadcast)
+            socket_b_ip[broadcast] = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
 
     while True:
-        readable, writable, exceptional = select.select([],
-                                                        broadcasts,
-                                                        [])
+        readable, writable, exceptional = select.select([], broadcasts, [])
         for s in writable:
-            s.sendto(str.encode('hello'), s.getsockname())
+            s.sendto(str.encode('hello'), (socket_b_ip[s], 9002))
         time.sleep(5)
 
 
 def get_advertise():
-    pass
+    intfs = ni.interfaces()
+    receive_from = []
+    for intf in intfs:
+        if intf != 'lo':
+            ip = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
+            receive = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+            receive.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            receive.bind((ip, 9002))
+            receive_from.append(receive)
+
+    while True:
+        readable, writable, exceptional = select.select(receive_from, [], [])
+        for s in readable:
+            data, address = s.recvfrom(1024)
+            received = data.decode()
+            print(received)
+            #destination = received['destination']
+            #port = received['port']
+        time.sleep(5)
 
 
 if __name__ == "__main__":
