@@ -47,7 +47,9 @@ def get_advertise():
             print(receiveddata)
             for (key, value) in receiveddata.items():
                 forwarding_table[key] = sourceaddress
-            print("forwarding_table: " + forwarding_table)
+
+            print("forwarding_table:")
+            print(forwarding_table)
         time.sleep(5)
 
 
