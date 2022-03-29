@@ -35,6 +35,7 @@ def get_advertise():
             ip = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
             receive = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             receive.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            receive.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(intf).encode('utf-8'))
             receive.bind((ip, 9002))
             receive_from.append(receive)
 
@@ -86,6 +87,7 @@ if __name__ == "__main__":
     print(input_sockets)
 
     threading.Thread(target=advertise).start()
+    threading.Thread(target=get_advertise).start()
     while True:
 
         readable, writable, exceptional = select.select(input_sockets,
@@ -95,7 +97,7 @@ if __name__ == "__main__":
             if s.proto == 17:
                 data, address = s.recvfrom(1024)
                 interface_ip = broadcast_to_tcp[s.getsockname()[0]]
-                forwarding_table[address[0]] = interface_ip
+                forwarding_table[address[0]] = (interface_ip, 0)
                 s.sendto(str.encode(interface_ip), (address[0], address[1]))
 
             if s in end_to_end_sockets.values():
