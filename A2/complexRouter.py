@@ -47,21 +47,20 @@ def get_advertise():
             receive.bind((ip, 9002))
             receive_from.append(receive)
 
-    while True:
-        r, w, e = select.select(receive_from, [], [])
-        for sock in r:
-            sourcedata, sourceaddress = sock.recvfrom(1024)
-            receiveddata = json.loads(sourcedata.decode())
-            print(receiveddata)
-            for (key, value) in receiveddata.items():
-                if key not in forwarding_table.keys() \
-                        or (key in forwarding_table.keys() and value[1] + 1 <
-                            forwarding_table[key][1]):
-                    forwarding_table[key] = (sourceaddress[0], value[1]+1)
+    r, w, e = select.select(receive_from, [], [])
+    for sock in r:
+        sourcedata, sourceaddress = sock.recvfrom(1024)
+        receiveddata = json.loads(sourcedata.decode())
+        print(receiveddata)
+        for (key, value) in receiveddata.items():
+            if key not in forwarding_table.keys() \
+                    or (key in forwarding_table.keys() and value[1] + 1 <
+                        forwarding_table[key][1]):
+                forwarding_table[key] = (sourceaddress[0], value[1] + 1)
 
-            print("forwarding_table:")
-            print(forwarding_table)
-        time.sleep(5)
+        print("forwarding_table:")
+        print(forwarding_table)
+    time.sleep(5)
 
 
 if __name__ == "__main__":
