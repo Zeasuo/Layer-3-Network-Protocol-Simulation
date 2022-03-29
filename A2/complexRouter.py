@@ -137,10 +137,13 @@ if __name__ == "__main__":
             if s in client_connections.values():
                 received = s.recv(1024)
                 data = json.loads(received.decode())
+                ttl = int(data['ttl'])
+                ttl -= 1
                 print(data)
                 destination = data['destination']
                 port = data['port']
                 if (destination, int(port)) not in client_connections:
                     s.send(str.encode("The destination is unreachable"))
-                data['ttl'] -= 1
-                client_connections[(destination, int(port))].send(received)
+                data['ttl'] = ttl
+                sent = json.dumps(data)
+                client_connections[(destination, int(port))].send(sent)
