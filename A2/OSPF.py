@@ -6,7 +6,9 @@ import netifaces as ni
 import select
 import json
 
-forwarding_table = {}
+SelfRouterIPToNeighboursIP = {}
+something = {}
+forwarding_table = [SelfRouterIPToNeighboursIP, something]
 # sockets that should be input or output to
 input_sockets = []
 output_sockets = []
@@ -75,6 +77,15 @@ def advertise():
                 print(forwarding_table)
                 time.sleep(5)
         time.sleep(5)
+
+
+def get_neighbour():
+    tIntfs = ni.interfaces()
+    for intf in tIntfs:
+        if intf == 'lo':
+
+        else:
+
 
 
 if __name__ == "__main__":
