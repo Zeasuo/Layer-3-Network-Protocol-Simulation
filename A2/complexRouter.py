@@ -157,14 +157,10 @@ if __name__ == "__main__":
                 ttl -= 1
                 data['ttl'] = ttl
                 sent = json.dumps(data)
-                if (destination, int(port)) in client_connections and ttl >= 0:
+                if (destination, int(port)) in client_connections and ttl > 0:
                     client_connections[(destination, int(port))].send(str.encode(sent))
-                elif destination in forwarding_table and ttl >= 1:
+                elif destination in forwarding_table and ttl > 0:
                     print("sending to other router")
                     client_connections[(forwarding_table[destination][0], 9005)].send(str.encode(sent))
                 else:
                     s.send(str.encode(json.dumps("The destination is unreachable")))
-
-
-
-
