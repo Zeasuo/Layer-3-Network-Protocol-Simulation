@@ -144,6 +144,7 @@ if __name__ == "__main__":
                 input_sockets.append(new_connection)
                 output_sockets.append(new_connection)
                 print(client_connections)
+                print(router_connections)
                 print("connection established on ip ", client_ip)
 
             if s in client_connections.values() or s in router_connections:
