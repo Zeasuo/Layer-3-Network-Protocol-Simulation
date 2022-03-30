@@ -72,7 +72,7 @@ if __name__ == "__main__":
                 ttl -= 1
                 port = data['port']
                 if (destination, int(port)) not in client_connections:
-                    s.send("The destination is unreachable")
+                    s.send(str.encode("The destination is unreachable"))
                 data['ttl'] = ttl
                 sent = json.dumps(data)
                 client_connections[(destination, int(port))].send(sent)
