@@ -58,8 +58,8 @@ def advertise():
 
             if sourceAddress[0] not in nearby_router:
                 new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                new_socket.bind((sourceAddress[0], 9000))
-                new_socket.connect(sourceAddress[0])
+                new_socket.bind((s.getsockname()[0], 9000))
+                new_socket.connect((sourceAddress[0], 9000))
                 input_sockets.append(new_socket)
                 output_sockets.append(new_socket)
                 nearby_router.append(sourceAddress[0])
