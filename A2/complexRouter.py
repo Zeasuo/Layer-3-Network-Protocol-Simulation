@@ -7,13 +7,20 @@ import select
 import json
 
 forwarding_table = {}
-
+# sockets that should be input or output to
+input_sockets = []
+output_sockets = []
 
 def advertise():
-    intfs = ni.interfaces()
+    global input_sockets
+    global output_sockets
+    global router_connection
+    tIntfs = ni.interfaces()
     broadcasts = []
+    receive_from = []
     socket_b_ip = {}
-    for intf in intfs:
+    nearby_router = []
+    for intf in tIntfs:
         if intf != 'lo':
             ip = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
             broadcast = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
@@ -21,58 +28,56 @@ def advertise():
             broadcast.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             broadcast.bind((ip, 9001))
             broadcasts.append(broadcast)
-            socket_b_ip[broadcast] = ni.ifaddresses(intf)[ni.AF_INET][0][
-                'broadcast']
+            socket_b_ip[broadcast] = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
 
-    while True:
-        readable, writable, exceptional = select.select([], broadcasts, [])
-        for s in writable:
-            s.sendto(str.encode(json.dumps(forwarding_table)),
-                     (socket_b_ip[s], 9002))
-        get_advertise()
-        time.sleep(5)
-
-
-def get_advertise():
-    intfs = ni.interfaces()
-    receive_from = []
-    for intf in intfs:
-        if intf != 'lo':
-            ip = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
+            ip_b = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
             receive = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
                                     socket.IPPROTO_UDP)
             receive.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             receive.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE,
                                str(intf).encode('utf-8'))
-            receive.bind((ip, 9002))
+            receive.bind((ip_b, 9002))
             receive_from.append(receive)
 
-    r, w, e = select.select(receive_from, [], [])
-    for sock in r:
-        sourcedata, sourceaddress = sock.recvfrom(1024)
-        receiveddata = json.loads(sourcedata.decode())
-        print(receiveddata)
-        for (key, value) in receiveddata.items():
-            if key not in forwarding_table.keys() \
-                    or (key in forwarding_table.keys() and value[1] + 1 <
-                        forwarding_table[key][1]):
-                forwarding_table[key] = (sourceaddress[0], value[1] + 1)
+    while True:
+        readable, writable, exceptional = select.select(receive_from, broadcasts, [])
+        for s in writable:
+            s.sendto(str.encode(json.dumps(forwarding_table)),
+                     (socket_b_ip[s], 9002))
 
-        print("forwarding_table:")
-        print(forwarding_table)
+        for s in readable:
+            sourcedata, sourceAddress = s.recvfrom(1024)
+            receivedData = json.loads(sourcedata.decode())
+            print("Received: " + receivedData)
+            for (key, value) in receivedData.items():
+                if key not in forwarding_table.keys() \
+                        or (key in forwarding_table.keys() and value[1] + 1 <
+                            forwarding_table[key][1]):
+                    forwarding_table[key] = (sourceAddress[0], value[1] + 1)
+
+            if sourceAddress[0] not in nearby_router:
+                new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                new_socket.bind((sourceAddress[0], 9000))
+                new_socket.connect(sourceAddress[0])
+                input_sockets.append(new_socket)
+                output_sockets.append(new_socket)
+                nearby_router.append(sourceAddress[0])
+
+            print("forwarding_table:")
+            print(forwarding_table)
+        time.sleep(5)
 
 
 if __name__ == "__main__":
     # initializing sockets for each interface other than loopback
+    global input_sockets
+    global output_sockets
     listen_sockets = {}
     end_to_end_sockets = {}
     interfaces = ni.interfaces()
-    # sockets that should be input or output to
-    input_sockets = []
-    output_sockets = []
     # dictionary that map broadcast ip to inet addr
     broadcast_to_tcp = {}
-    # dictionary the map client ip address to a specific socket
+    # dictionary the map client/router ip address to a specific socket
     client_connections = {}
     ip_to_intf = {}
     # Assign some sockets to all interfaces' broadcast IP
@@ -142,9 +147,16 @@ if __name__ == "__main__":
                 print(data)
                 destination = data['destination']
                 port = data['port']
-                if (destination, int(port)) not in client_connections:
-                    s.send(str.encode("The destination is unreachable"))
-                    break
                 data['ttl'] = ttl
                 sent = json.dumps(data)
-                client_connections[(destination, int(port))].send(sent)
+                if (destination, int(port)) in client_connections:
+                    client_connections[(destination, int(port))].send(sent)
+
+                elif (destination, int(port)) in forwarding_table:
+                    client_connections[(forwarding_table[(destination, int(port))][0], int(port))].send(sent)
+                else:
+                    s.send(str.encode("The destination is unreachable"))
+
+
+
+
