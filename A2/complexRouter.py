@@ -16,7 +16,7 @@ router_connections = []
 def advertise():
     global input_sockets
     global output_sockets
-    global router_connection
+    global router_connections
     tIntfs = ni.interfaces()
     broadcasts = []
     receive_from = []
