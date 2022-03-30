@@ -15,8 +15,9 @@ if __name__ == "__main__":
             readable, writable, exceptional = select.select([connection, subnet_connection_listener], [], [])
 
             if connection in readable:
-                print(received)
-                received = json.loads(connection.recv(1024).decode())
+                temp = connection.recv(1024)
+                print(temp)
+                received = json.loads(temp.decode())
                 if not received:
                     sys.exit(0)
 
