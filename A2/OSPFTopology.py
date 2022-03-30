@@ -79,7 +79,7 @@ class OSPF(Topo):
         intf_ip = 1
         m_intf_num = 0
         for r in [r1, r2, r3]:
-            self.addLink(r, m0, intfName1=r+"-eth10", intftName2="m0-eth"+str(m_intf_num), params1={'ip': '11.'+str(intf_ip)+'.11.1/24'}, params2={'ip':'11.1.0.'+str(intf_ip)})
+            self.addLink(r, m0, intfName1=r+"-eth10", intftName2="m0-eth"+str(m_intf_num), params1={'ip': '11.'+str(intf_ip)+'.11.1/24'}, params2={'ip':'11.1.0.'+str(intf_ip)+'/24'})
             m_intf_num += 1
             intf_ip += 1
 
