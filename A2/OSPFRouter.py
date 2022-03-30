@@ -29,7 +29,7 @@ def get_neighbour():
             else:
                 neighbours.append(ip)
         SelfRouterIPToNeighboursIP[selfip] = neighbours
-        print(neighbours)
+        print(SelfRouterIPToNeighboursIP)
         time.sleep(5)
 
 
