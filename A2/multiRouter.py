@@ -87,7 +87,7 @@ class MultiRouter(Topo):
         self.addLink(r1, r3, intfName1='r1-eth3', intftName2='r3-eth1',
                      params1={'ip': '10.105.0.1/24'},
                      params2={'ip': '10.105.0.2/24'})
-        self.addLink(r2, r3, intfName1='r2-eth2', intftName2='r3-eth2',
+        self.addLink(r2, r3, intfName1='r2-eth3', intftName2='r3-eth2',
                      params1={'ip': '10.106.0.1/24'},
                      params2={'ip': '10.106.0.2/24'})
 
