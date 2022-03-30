@@ -5,7 +5,7 @@ from mininet.node import RemoteController
 from mininet.topo import Topo
 
 
-class MultiRouter(Topo):
+class OSPF(Topo):
     """
         A multi-router network topology to test basic functionality of router broadcasting and advertising
 
@@ -84,4 +84,4 @@ class MultiRouter(Topo):
             intf_ip += 1
 
 
-topos = {'multiRouter': (lambda: MultiRouter())}
+topos = {'ospf': (lambda: OSPF())}
