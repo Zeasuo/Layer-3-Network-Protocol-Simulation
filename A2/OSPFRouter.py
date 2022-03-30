@@ -30,7 +30,8 @@ def get_neighbour():
                 neighbours.append(ip)
         SelfRouterIPToNeighboursIP[selfip] = neighbours
         print(neighbours)
-    time.sleep(5)
+        time.sleep(5)
+
 
 if __name__ == "__main__":
     # initializing sockets for each interface other than loopback
