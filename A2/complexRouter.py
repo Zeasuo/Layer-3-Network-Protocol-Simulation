@@ -152,6 +152,7 @@ if __name__ == "__main__":
                 if (destination, int(port)) in client_connections:
                     client_connections[(destination, int(port))].send(str.encode(sent))
                 elif destination in forwarding_table:
+                    print("sending to other router")
                     client_connections[(forwarding_table[destination][0], 9000)].send(str.encode(sent))
                 else:
                     s.send(str.encode(json.dumps("The destination is unreachable")))
