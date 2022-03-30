@@ -121,7 +121,6 @@ if __name__ == "__main__":
                                                         output_sockets,
                                                         [])
         for s in readable:
-            print(client_connections)
             if s.proto == 17:
                 data, address = s.recvfrom(1024)
                 interface_ip = broadcast_to_tcp[s.getsockname()[0]]
