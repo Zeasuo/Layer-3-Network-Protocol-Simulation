@@ -20,6 +20,7 @@ def advertise():
     receive_from = []
     socket_b_ip = {}
     nearby_router = []
+    bip_to_inet = {}
     for intf in tIntfs:
         if intf != 'lo':
             ip = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
@@ -39,6 +40,8 @@ def advertise():
             receive.bind((ip_b, 9002))
             receive_from.append(receive)
 
+            bip_to_inet[ip_b] = ip
+
     while True:
         readable, writable, exceptional = select.select(receive_from, broadcasts, [])
         if readable:
@@ -55,7 +58,8 @@ def advertise():
 
                 if sourceAddress[0] not in nearby_router:
                     new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    new_socket.bind((s.getsockname()[0], 9000))
+                    print(bip_to_inet[s.getsockname()[0]])
+                    new_socket.bind((bip_to_inet[s.getsockname()[0]], 9000))
                     new_socket.connect((sourceAddress[0], 9000))
                     input_sockets.append(new_socket)
                     output_sockets.append(new_socket)
