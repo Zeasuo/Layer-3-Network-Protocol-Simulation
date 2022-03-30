@@ -120,6 +120,7 @@ if __name__ == "__main__":
                                                         output_sockets,
                                                         [])
         for s in readable:
+            print(client_connections)
             if s.proto == 17:
                 data, address = s.recvfrom(1024)
                 interface_ip = broadcast_to_tcp[s.getsockname()[0]]
@@ -150,7 +151,6 @@ if __name__ == "__main__":
                 sent = json.dumps(data)
                 if (destination, int(port)) in client_connections:
                     client_connections[(destination, int(port))].send(str.encode(sent))
-
                 elif destination in forwarding_table:
                     client_connections[(forwarding_table[destination][0], 9000)].send(str.encode(sent))
                 else:
