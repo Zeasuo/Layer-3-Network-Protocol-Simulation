@@ -75,5 +75,5 @@ if __name__ == "__main__":
                     s.send(str.encode("The destination is unreachable"))
                 data['ttl'] = ttl
                 sent = json.dumps(data)
-                client_connections[(destination, int(port))].send(sent)
+                client_connections[(destination, int(port))].send(str.encode(sent))
 

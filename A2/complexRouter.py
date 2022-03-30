@@ -149,10 +149,10 @@ if __name__ == "__main__":
                 data['ttl'] = ttl
                 sent = json.dumps(data)
                 if (destination, int(port)) in client_connections:
-                    client_connections[(destination, int(port))].send(sent)
+                    client_connections[(destination, int(port))].send(str.encode(sent))
 
                 elif (destination, int(port)) in forwarding_table:
-                    client_connections[(forwarding_table[(destination, int(port))][0], 9000)].send(sent)
+                    client_connections[(forwarding_table[(destination, int(port))][0], 9000)].send(str.encode(sent))
                 else:
                     s.send(str.encode("The destination is unreachable"))
 
