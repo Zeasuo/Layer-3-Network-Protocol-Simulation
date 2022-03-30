@@ -81,11 +81,16 @@ def advertise():
 
 def get_neighbour():
     tIntfs = ni.interfaces()
+    selfip = -1
+    neighbours = []
     for intf in tIntfs:
+        ip = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
         if intf == 'lo':
-
+            selfip = ip
+            SelfRouterIPToNeighboursIP[ip] = []
         else:
-
+            neighbours.append(ip)
+    SelfRouterIPToNeighboursIP[selfip] = neighbours
 
 
 if __name__ == "__main__":
