@@ -57,7 +57,7 @@ def advertise():
                                     forwarding_table[key][1]):
                             forwarding_table[key] = (sourceAddress[0], value[1] + 1)
 
-                    if sourceAddress[0] not in nearby_router and :
+                    if sourceAddress[0] not in nearby_router:
                         new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         new_socket.bind((bip_to_inet[s.getsockname()[0]], 9005))
                         new_socket.connect((sourceAddress[0], 9000))
