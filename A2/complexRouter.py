@@ -41,31 +41,31 @@ def advertise():
 
     while True:
         readable, writable, exceptional = select.select(receive_from, broadcasts, [])
+        if readable:
+            for s in readable:
+                sourcedata, sourceAddress = s.recvfrom(1024)
+                receivedData = json.loads(sourcedata.decode())
+                print("Received: ")
+                print(receivedData)
+                for (key, value) in receivedData.items():
+                    if key not in forwarding_table.keys() \
+                            or (key in forwarding_table.keys() and value[1] + 1 <
+                                forwarding_table[key][1]):
+                        forwarding_table[key] = (sourceAddress[0], value[1] + 1)
 
-        for s in readable:
-            sourcedata, sourceAddress = s.recvfrom(1024)
-            receivedData = json.loads(sourcedata.decode())
-            print("Received: ")
-            print(receivedData)
-            for (key, value) in receivedData.items():
-                if key not in forwarding_table.keys() \
-                        or (key in forwarding_table.keys() and value[1] + 1 <
-                            forwarding_table[key][1]):
-                    forwarding_table[key] = (sourceAddress[0], value[1] + 1)
+                if sourceAddress[0] not in nearby_router:
+                    new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    new_socket.bind((s.getsockname()[0], 9000))
+                    new_socket.connect((sourceAddress[0], 9000))
+                    input_sockets.append(new_socket)
+                    output_sockets.append(new_socket)
+                    nearby_router.append(sourceAddress[0])
+        else:
+            for s in writable:
+                s.sendto(str.encode(json.dumps(forwarding_table)), (socket_b_ip[s], 9002))
 
-            if sourceAddress[0] not in nearby_router:
-                new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                new_socket.bind((s.getsockname()[0], 9000))
-                new_socket.connect((sourceAddress[0], 9000))
-                input_sockets.append(new_socket)
-                output_sockets.append(new_socket)
-                nearby_router.append(sourceAddress[0])
-
-        for s in writable:
-            s.sendto(str.encode(json.dumps(forwarding_table)), (socket_b_ip[s], 9002))
-
-            print("forwarding_table:")
-            print(forwarding_table)
+                print("forwarding_table:")
+                print(forwarding_table)
         time.sleep(5)
 
 
