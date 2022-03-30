@@ -151,15 +151,15 @@ if __name__ == "__main__":
                 received = s.recv(1024)
                 data = json.loads(received.decode())
                 ttl = int(data['ttl'])
-                ttl -= 1
-                print(data)
                 destination = data['destination']
                 port = data['port']
+                print(data)
+                ttl -= 1
                 data['ttl'] = ttl
                 sent = json.dumps(data)
-                if (destination, int(port)) in client_connections:
+                if (destination, int(port)) in client_connections and ttl >= 0:
                     client_connections[(destination, int(port))].send(str.encode(sent))
-                elif destination in forwarding_table:
+                elif destination in forwarding_table and ttl >= 1:
                     print("sending to other router")
                     client_connections[(forwarding_table[destination][0], 9005)].send(str.encode(sent))
                 else:
