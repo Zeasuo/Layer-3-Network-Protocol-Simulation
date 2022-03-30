@@ -59,7 +59,7 @@ def advertise():
                 if sourceAddress[0] not in nearby_router:
                     new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     print(bip_to_inet[s.getsockname()[0]])
-                    new_socket.bind((bip_to_inet[s.getsockname()[0]], 9000))
+                    new_socket.bind((bip_to_inet[s.getsockname()[0]], 9005))
                     new_socket.connect((sourceAddress[0], 9000))
                     input_sockets.append(new_socket)
                     output_sockets.append(new_socket)
@@ -157,7 +157,7 @@ if __name__ == "__main__":
                     client_connections[(destination, int(port))].send(str.encode(sent))
                 elif destination in forwarding_table:
                     print("sending to other router")
-                    client_connections[(forwarding_table[destination][0], 9000)].send(str.encode(sent))
+                    client_connections[(forwarding_table[destination][0], 9005)].send(str.encode(sent))
                 else:
                     s.send(str.encode(json.dumps("The destination is unreachable")))
 
