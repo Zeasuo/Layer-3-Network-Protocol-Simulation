@@ -70,8 +70,6 @@ def advertise():
 
 if __name__ == "__main__":
     # initializing sockets for each interface other than loopback
-    global input_sockets
-    global output_sockets
     listen_sockets = {}
     end_to_end_sockets = {}
     interfaces = ni.interfaces()
@@ -153,7 +151,7 @@ if __name__ == "__main__":
                     client_connections[(destination, int(port))].send(sent)
 
                 elif (destination, int(port)) in forwarding_table:
-                    client_connections[(forwarding_table[(destination, int(port))][0], int(port))].send(sent)
+                    client_connections[(forwarding_table[(destination, int(port))][0], 9000)].send(sent)
                 else:
                     s.send(str.encode("The destination is unreachable"))
 
