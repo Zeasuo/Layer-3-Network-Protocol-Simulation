@@ -41,9 +41,6 @@ def advertise():
 
     while True:
         readable, writable, exceptional = select.select(receive_from, broadcasts, [])
-        for s in writable:
-            s.sendto(str.encode(json.dumps(forwarding_table)),
-                     (socket_b_ip[s], 9002))
 
         for s in readable:
             sourcedata, sourceAddress = s.recvfrom(1024)
@@ -63,6 +60,9 @@ def advertise():
                 input_sockets.append(new_socket)
                 output_sockets.append(new_socket)
                 nearby_router.append(sourceAddress[0])
+
+        for s in writable:
+            s.sendto(str.encode(json.dumps(forwarding_table)), (socket_b_ip[s], 9002))
 
             print("forwarding_table:")
             print(forwarding_table)
