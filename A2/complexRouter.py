@@ -10,6 +10,8 @@ forwarding_table = {}
 # sockets that should be input or output to
 input_sockets = []
 output_sockets = []
+client_connections = {}
+router_connections = []
 
 def advertise():
     global input_sockets
@@ -63,6 +65,7 @@ def advertise():
                         new_socket.connect((sourceAddress[0], 9000))
                         input_sockets.append(new_socket)
                         output_sockets.append(new_socket)
+                        router_connections.append(new_socket)
                         nearby_router.append(sourceAddress[0])
         else:
             for s in writable:
@@ -82,7 +85,7 @@ if __name__ == "__main__":
     # dictionary that map broadcast ip to inet addr
     broadcast_to_tcp = {}
     # dictionary the map client/router ip address to a specific socket
-    client_connections = {}
+
     ip_to_intf = {}
     # Assign some sockets to all interfaces' broadcast IP
     for intf in interfaces:
@@ -143,7 +146,7 @@ if __name__ == "__main__":
                 print(client_connections)
                 print("connection established on ip ", client_ip)
 
-            if s in client_connections.values():
+            if s in client_connections.values() or s in router_connections:
                 received = s.recv(1024)
                 data = json.loads(received.decode())
                 ttl = int(data['ttl'])
