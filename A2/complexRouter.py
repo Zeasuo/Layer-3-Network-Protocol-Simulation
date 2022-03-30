@@ -48,7 +48,7 @@ def advertise():
             for s in readable:
                 sourcedata, sourceAddress = s.recvfrom(1024)
                 receivedData = json.loads(sourcedata.decode())
-                print("Received: ")
+                print("Received: from "+sourceAddress[0])
                 print(receivedData)
                 for (key, value) in receivedData.items():
                     if key not in forwarding_table.keys() \
