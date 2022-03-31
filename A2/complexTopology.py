@@ -1,7 +1,7 @@
 from mininet.topo import Topo
 
 
-class MultiRouter(Topo):
+class ComplexRouter(Topo):
     """
         A multi-router network topology to test basic functionality of router broadcasting and advertising
         r1 = u  s1  h1
@@ -106,5 +106,4 @@ class MultiRouter(Topo):
                      params2={'ip': '10.116.0.2/24'})
 
 
-topos = {'multiRouter': (lambda: MultiRouter())}
-
+topos = {'complex': (lambda: ComplexRouter())}
