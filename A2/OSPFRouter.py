@@ -6,9 +6,7 @@ import netifaces as ni
 import select
 import json
 
-SelfRouterIPToNeighboursIP = {}
-something = {}
-forwarding_table = [SelfRouterIPToNeighboursIP, something]
+forwarding_table = {}
 # sockets that should be input or output to
 input_sockets = []
 output_sockets = []
@@ -19,6 +17,12 @@ neighbor_routers = {}
 
 
 def get_neighbour():
+<<<<<<< HEAD
+=======
+    global input_sockets
+    global output_sockets
+    global router_connections
+>>>>>>> b0e480308b18b8b9a0a442c8aeb442aed3aaf60e
     tIntfs = ni.interfaces()
     broadcasts = []
     receive_from = []
@@ -68,7 +72,6 @@ def get_neighbour():
         else:
             for s in writable:
                 s.sendto(str.encode(json.dumps('hello there')), (socket_b_ip[s], 9002))
-
                 time.sleep(5)
         time.sleep(5)
 
@@ -114,7 +117,6 @@ if __name__ == "__main__":
 
     input_sockets = list(listen_sockets.values()) + list(
         end_to_end_sockets.values())
-    print(input_sockets)
 
     threading.Thread(target=get_neighbour).start()
 
