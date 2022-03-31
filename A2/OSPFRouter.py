@@ -55,7 +55,7 @@ def get_neighbour():
                 if sourceAddress[0] != bip_to_inet[s.getsockname()[0]]:
                     receivedData = json.loads(sourcedata.decode())
                     print("Received: from " + sourceAddress[0])
-                    neighbor_routers[bip_to_inet[s.getsockname()[0]]] = sourceAddress
+                    neighbor_routers[bip_to_inet[s.getsockname()[0]]] = sourceAddress[0]
                     print(neighbor_routers)
 
                     if sourceAddress[0] not in nearby_router:
