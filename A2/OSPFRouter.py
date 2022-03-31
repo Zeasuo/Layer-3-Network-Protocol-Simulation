@@ -17,12 +17,9 @@ neighbor_routers = {}
 
 
 def get_neighbour():
-<<<<<<< HEAD
-=======
     global input_sockets
     global output_sockets
     global router_connections
->>>>>>> b0e480308b18b8b9a0a442c8aeb442aed3aaf60e
     tIntfs = ni.interfaces()
     broadcasts = []
     receive_from = []
@@ -74,7 +71,6 @@ def get_neighbour():
                 s.sendto(str.encode(json.dumps('hello there')), (socket_b_ip[s], 9002))
                 time.sleep(5)
         time.sleep(5)
-
 
 if __name__ == "__main__":
     # initializing sockets for each interface other than loopback
