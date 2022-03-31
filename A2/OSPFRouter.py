@@ -15,21 +15,61 @@ output_sockets = []
 client_connections = {}
 router_connections = []
 
+neighbor_routers = {}
+
 
 def get_neighbour():
-    while True:
-        tIntfs = ni.interfaces()
-        selfip = -1
-        neighbours = []
-        for intf in tIntfs:
+    tIntfs = ni.interfaces()
+    broadcasts = []
+    receive_from = []
+    socket_b_ip = {}
+    nearby_router = []
+    bip_to_inet = {}
+    for intf in tIntfs:
+        if intf != 'lo':
             ip = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
-            if intf == 'lo':
-                selfip = ip
-                SelfRouterIPToNeighboursIP[ip] = []
-            else:
-                neighbours.append(ip)
-        SelfRouterIPToNeighboursIP[selfip] = neighbours
-        print(SelfRouterIPToNeighboursIP)
+            broadcast = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
+                                      socket.IPPROTO_UDP)
+            broadcast.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            broadcast.bind((ip, 9001))
+            broadcasts.append(broadcast)
+            socket_b_ip[broadcast] = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
+
+            ip_b = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
+            receive = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
+                                    socket.IPPROTO_UDP)
+            receive.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            receive.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE,
+                               str(intf).encode('utf-8'))
+            receive.bind((ip_b, 9002))
+            receive_from.append(receive)
+
+            bip_to_inet[ip_b] = ip
+
+    while True:
+        readable, writable, exceptional = select.select(receive_from, broadcasts, [])
+        if readable:
+            for s in readable:
+                sourcedata, sourceAddress = s.recvfrom(1024)
+                if sourceAddress[0] != bip_to_inet[s.getsockname()[0]]:
+                    receivedData = json.loads(sourcedata.decode())
+                    print("Received: from " + sourceAddress[0])
+                    neighbor_routers[bip_to_inet[s.getsockname()[0]]] = sourceAddress
+                    print(neighbor_routers)
+
+                    if sourceAddress[0] not in nearby_router:
+                        new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        new_socket.bind((bip_to_inet[s.getsockname()[0]], 9005))
+                        new_socket.connect((sourceAddress[0], 9000))
+                        input_sockets.append(new_socket)
+                        output_sockets.append(new_socket)
+                        router_connections.append(new_socket)
+                        nearby_router.append(sourceAddress[0])
+        else:
+            for s in writable:
+                s.sendto(str.encode(json.dumps('hello there')), (socket_b_ip[s], 9002))
+
+                time.sleep(5)
         time.sleep(5)
 
 
@@ -120,7 +160,3 @@ if __name__ == "__main__":
                     client_connections[(forwarding_table[destination][0], 9005)].send(str.encode(sent))
                 else:
                     s.send(str.encode(json.dumps("The destination is unreachable")))
-
-
-
-
