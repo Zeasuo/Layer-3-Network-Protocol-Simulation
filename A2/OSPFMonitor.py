@@ -19,17 +19,26 @@ routing_table = {"r1": ["r2", "r3", "r4", "r5"], "r2": ["r1", "r4", "r5"], "r3":
 
 """
     forwarding_table follows the format: {souceIP: destIP}
-    process raw_forwarding_table and return a dictionary of {node: [neighbour ip]}
+    process forwarding_table and return a dictionary of {node: [neighbour ip]}
 """
 def process_forwarding_table(forwarding_table, source_address):
-    connects_to = [] # the ip address of the node that this router connects to
-    if source_address not in router_to_forwarding_table:
+    # if it's the first time we've seen this source address
+    if source_address not in source_address_to_router:
         router = "r" + str(router_count)
         router_count += 1
         router_to_forwarding_table[router] = forwarding_table
+        source_address_to_router[source_address] = router
+    # if we've seen this source address before
+    else:
+        # if the forwarding table is different from the previous one
+        if router_to_forwarding_table[source_address_to_router[source_address]] != forwarding_table:
+            # update the forwarding table, and destination IP to source IP mapping
+            router_to_forwarding_table[source_address_to_router[source_address]] = forwarding_table
+            for destIP in forwarding_table:
+                
     for key, value in forwarding_table.items():
         destIP_to_sourceIP[value] = key
-        connects_to.append(value)
+    
     
 
 
