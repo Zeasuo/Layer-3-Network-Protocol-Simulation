@@ -87,12 +87,12 @@ def process_forwarding_table(forwarding_table, source_address):
                 routing_table[currect_router].append(router)
                 routing_table[router].append(currect_router)
                 # add connection to connection dictionary
-                if router not in connection:
-                    connection[router] = {}
-                connection[router][currect_router] = (source_ip, dest_ip)
                 if currect_router not in connection:
                     connection[currect_router] = {}
                 connection[currect_router][router] = (source_ip, dest_ip)
+                if router not in connection:
+                    connection[router] = {}
+                connection[router][currect_router] = (dest_ip, source_ip)
                 break
     return currect_router        
 
@@ -108,6 +108,7 @@ def process_forwarding_table(forwarding_table, source_address):
 """
 def process_routing_table(currect_router):
     global routing_table_to_send
+
     # get receiving router IP, which is source ip but with last digit changed to 2 (e.g. 11.1.11.1 -> 11.1.11.2)
     for currect_router in routing_table.keys():
         current_routing_table = computed_routing_table[currect_router]
