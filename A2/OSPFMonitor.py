@@ -76,7 +76,7 @@ def send_and_receive_table():
                     print("Received: from "+sourceAddress[0])
                     print(receivedData)
                     # pass the received data into the function
-                    set_routing_table(receivedData, sourceAddress)
+                    set_routing_table(receivedData, sourceAddress[0])
 
             for s in writable:
                 if s.gotsockname()[0] in routing_table_to_send:
