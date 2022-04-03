@@ -83,11 +83,12 @@ Only use golable variables forwards_table
 
 def send_forwarding_table():
     tIntfs = ni.interfaces()
-    global old_neighbor_routers, ip2
+    global old_neighbor_routers
+    b_ip = 0
     send_to = []
     for intf in tIntfs:
         if 'eth10' in intf:
-            ip2 = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
+            b_ip = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
             monitor_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             monitor_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             monitor_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(intf).encode('utf-8'))
@@ -100,7 +101,7 @@ def send_forwarding_table():
             if writable:
                 for s in writable:
                     print(ip2)
-                    s.sendto(str.encode(json.dumps(forwarding_table)), (ip2, 8002))
+                    s.sendto(str.encode(json.dumps(forwarding_table)), (b_ip, 8002))
             old_neighbor_routers = neighbor_routers
 
 
