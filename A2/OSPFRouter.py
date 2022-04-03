@@ -89,10 +89,11 @@ def send_forwarding_table():
     for intf in tIntfs:
         if 'eth10' in intf:
             b_ip = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
+            ip = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
             monitor_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             monitor_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             monitor_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(intf).encode('utf-8'))
-            monitor_socket.bind((ip2, 8002))
+            monitor_socket.bind((ip, 8005))
             send_to.append(monitor_socket)
 
     while True:
@@ -100,7 +101,7 @@ def send_forwarding_table():
             readable, writable, exceptional = select.select([], send_to, [])
             if writable:
                 for s in writable:
-                    print(ip2)
+                    print(b_ip)
                     s.sendto(str.encode(json.dumps(forwarding_table)), (b_ip, 8002))
             old_neighbor_routers = neighbor_routers
 
