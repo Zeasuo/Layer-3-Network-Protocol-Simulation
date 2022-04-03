@@ -93,13 +93,9 @@ def send_forwarding_table():
         if 'eth10' in intf:
             ip2 = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
             ip = ip2
-            monitor_socket = socket.socket(socket.AF_INET,
-                                           socket.SOCK_STREAM)
-            monitor_socket.setsockopt(socket.SOL_SOCKET,
-                                      socket.SO_REUSEADDR, 1)
-            monitor_socket.setsockopt(socket.SOL_SOCKET,
-                                      socket.SO_BINDTODEVICE,
-                                      str(intf).encode('utf-8'))
+            monitor_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+            monitor_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            monitor_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(intf).encode('utf-8'))
             monitor_socket.bind((ip2, 8002))
             send_to.append(monitor_socket)
 
