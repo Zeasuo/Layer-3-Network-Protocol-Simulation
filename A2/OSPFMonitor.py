@@ -45,6 +45,7 @@ def set_routing_table(forwarding_table, source_address):
     current_router = process_forwarding_table(forwarding_table, source_address)
     dijkstra(routing_table)
     process_routing_table(current_router)
+    print_routing_table()
 
 
 """
