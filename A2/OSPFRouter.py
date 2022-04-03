@@ -115,13 +115,9 @@ def get_forwarding_table():
     for intf in interfaces:
         if 'eth10' in intf:
             ip2 = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
-            monitor_socket = socket.socket(socket.AF_INET,
-                                                    socket.SOCK_STREAM)
-            monitor_socket.setsockopt(socket.SOL_SOCKET,
-                                               socket.SO_REUSEADDR, 1)
-            monitor_socket.setsockopt(socket.SOL_SOCKET,
-                                               socket.SO_BINDTODEVICE,
-                                               str(intf).encode('utf-8'))
+            monitor_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+            monitor_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            monitor_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(intf).encode('utf-8'))
             monitor_socket.bind((ip2, 8005))
             monitor.append(monitor_socket)
 
