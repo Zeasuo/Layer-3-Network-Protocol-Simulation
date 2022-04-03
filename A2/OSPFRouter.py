@@ -74,11 +74,8 @@ def get_neighbour():
 
 
 def print_forwarding_table():
-    global forwarding_table
     print("Forwarding Table:")
-    for key in forwarding_table.keys():
-        print(key + ": " + forwarding_table[key][0] + " " + str(forwarding_table[key][1]))
-
+    print(neighbor_routers)
 '''
 This function creates a socket to OSPFMonitor and writes the forwarding table to it.
 Only use golable variables forwards_table 
