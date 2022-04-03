@@ -12,7 +12,7 @@ input_sockets = []
 output_sockets = []
 client_connections = {}
 router_connections = []
-
+old_neighbor_routers = {}
 neighbor_routers = {}
 
 
@@ -85,10 +85,57 @@ Only use golable variables forwards_table
 '''
 
 def send_forwarding_table():
-    pass
+    tIntfs = ni.interfaces()
+    global old_neighbor_routers
+    ip = -1
+    send_to = []
+    for intf in tIntfs:
+        if 'eth10' in intf:
+            ip2 = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
+            ip = ip2
+            monitor_socket = socket.socket(socket.AF_INET,
+                                           socket.SOCK_STREAM)
+            monitor_socket.setsockopt(socket.SOL_SOCKET,
+                                      socket.SO_REUSEADDR, 1)
+            monitor_socket.setsockopt(socket.SOL_SOCKET,
+                                      socket.SO_BINDTODEVICE,
+                                      str(intf).encode('utf-8'))
+            monitor_socket.bind((ip2, 8002))
+            send_to.append(monitor_socket)
+
+    while True:
+        if old_neighbor_routers != neighbor_routers:
+            readable, writable, exceptional = select.select([], send_to, [])
+            if writable:
+                for s in writable:
+                    s.sendto(str.encode(json.dumps(forwarding_table)), (ip, 8002))
+            old_neighbor_routers = neighbor_routers
 
 
+def get_forwarding_table():
+    global forwarding_table
+    interfaces = ni.interfaces()
+    monitor = []
+    for intf in interfaces:
+        if 'eth10' in intf:
+            ip2 = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
+            monitor_socket = socket.socket(socket.AF_INET,
+                                                    socket.SOCK_STREAM)
+            monitor_socket.setsockopt(socket.SOL_SOCKET,
+                                               socket.SO_REUSEADDR, 1)
+            monitor_socket.setsockopt(socket.SOL_SOCKET,
+                                               socket.SO_BINDTODEVICE,
+                                               str(intf).encode('utf-8'))
+            monitor_socket.bind((ip2, 8005))
+            monitor.append(monitor_socket)
 
+    while True:
+        readable, writable, exceptional = select.select(monitor)
+        if readable:
+            received, address = s.recvfrom(1024)
+            data = json.loads(received.decode())
+            print(data)
+            forwarding_table = data
 
 
 if __name__ == "__main__":
@@ -103,7 +150,7 @@ if __name__ == "__main__":
     ip_to_intf = {}
     # Assign some sockets to all interfaces' broadcast IP
     for intf in interfaces:
-        if intf != 'lo':
+        if intf != 'lo' and 'eth10' not in intf:
             ip = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
             listen_sockets[ip] = socket.socket(socket.AF_INET,
                                                socket.SOCK_DGRAM,

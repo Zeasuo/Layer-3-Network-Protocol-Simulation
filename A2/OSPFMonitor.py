@@ -78,7 +78,7 @@ def send_and_receive_table():
 
             for s in writable:
                 if s.gotsockname()[0] in routing_table_to_send:
-                    s.sendto(str.encode(json.dumps(routing_table_to_send[s.getsockname()[0]])), (socket_b_ip[s], ))
+                    s.sendto(str.encode(json.dumps(routing_table_to_send[s.getsockname()[0]])), (socket_b_ip[s], 8005))
         time.sleep(5)
 
 
