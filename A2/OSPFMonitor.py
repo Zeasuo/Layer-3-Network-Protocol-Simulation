@@ -1,11 +1,9 @@
-from re import T
 import socket
-
 import threading
 import time
-
-#import netifaces as ni
 import select
+import netifaces as ni
+import json
 
 
 """
@@ -27,13 +25,70 @@ routing_table_to_send = {}
 # format: {source_router: {destination_router: (source_ip, destination_ip)}} e.g. {'r1': {'r2': ('10.104.0.1', '10.104.0.2')}}
 connection = {}
 
+input_sockets = []
+output_sockets = []
+router_connections = []
 
 """
     This function listens for incoming forwarding table from other routers
     and sends routing table to other routers
 """
 def send_and_receive_table():
-    pass
+    global input_sockets
+    global output_sockets
+    global router_connections
+    tIntfs = ni.interfaces()
+    broadcasts = []
+    receive_from = []
+    socket_b_ip = {}
+    all_routers = []
+    bip_to_inet = {}
+    for intf in tIntfs:
+        if intf != 'lo':
+            ip = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
+            broadcast = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
+                                      socket.IPPROTO_UDP)
+            broadcast.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            broadcast.bind((ip, 9001))
+            broadcasts.append(broadcast)
+            socket_b_ip[broadcast] = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
+
+            ip_b = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
+            receive = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
+                                    socket.IPPROTO_UDP)
+            receive.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            receive.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE,
+                               str(intf).encode('utf-8'))
+            receive.bind((ip_b, 9002))
+            receive_from.append(receive)
+
+            bip_to_inet[ip_b] = ip
+
+    while True:
+        readable, writable, exceptional = select.select(receive_from, broadcasts, [])
+        if readable:
+            for s in readable:
+                sourcedata, sourceAddress = s.recvfrom(1024)
+                if sourceAddress[0] != bip_to_inet[s.getsockname()[0]]:
+                    receivedData = json.loads(sourcedata.decode())
+                    print("Received: from "+sourceAddress[0])
+                    print(receivedData)
+                    # pass the received data into the function
+                    set_routing_table(receivedData, sourceAddress)
+
+                    if sourceAddress[0] not in all_routers:
+                        new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        new_socket.bind((bip_to_inet[s.getsockname()[0]], 9005))
+                        new_socket.connect((sourceAddress[0], 9000))
+                        input_sockets.append(new_socket)
+                        output_sockets.append(new_socket)
+                        router_connections.append(new_socket)
+                        all_routers.append(sourceAddress[0])
+        else:
+            for s in writable:
+                if s.gotsockname()[0] in routing_table_to_send:
+                    s.sendto(str.encode(json.dumps(routing_table_to_send[s.getsockname()[0]])), (socket_b_ip[s], 9002))
+        time.sleep(5)
 
 
 """
@@ -79,7 +134,7 @@ def process_forwarding_table(forwarding_table, source_address):
     # update routing table
     for source_ip, dest_ip in forwarding_table.items():
         for router in router_to_forwarding_table.keys():
-            # if source_ip, dest_ip matches dest_ip, source_ip in forwarding table of another router 
+            # if source_ip, dest_ip matches dest_ip, source_ip in forwarding table of another router
             # and store this connection in connection dictionary
              if router != currect_router \
                 and dest_ip in router_to_forwarding_table[router] \
@@ -95,7 +150,7 @@ def process_forwarding_table(forwarding_table, source_address):
                     connection[router] = {}
                 connection[router][currect_router] = (dest_ip, source_ip)
                 break
-    return currect_router        
+    return currect_router
 
 
 """
@@ -150,7 +205,7 @@ def dijkstra(routing_table):
                 previous[node] = node
         # update computed_routing_table
         computed_routing_table[target_node] = previous
-    return 
+    return
 
 
 """
@@ -187,7 +242,7 @@ def process_routing_table(currect_router):
                     next_interface_ip = connection[currect_router][next_node][1]
                     routing_table_to_send[receiving_ip][destination_ip] = {source_interface_ip: next_interface_ip}
 
-    
+
 """
     A function that prints the routing table, and calculated_routing_table to the console
 """
@@ -197,6 +252,66 @@ def print_routing_table():
     print("Routing table to send: " + str(routing_table_to_send))
 
 if __name__ == "__main__":
-    set_routing_table({'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"},"11.1.11.1")
-    set_routing_table({'10.104.0.2': "10.104.0.1"},"11.2.11.1")
-    set_routing_table({'10.105.0.2': "10.105.0.1"},"11.3.11.1")
+    # set_routing_table({'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"},"11.1.11.1")
+    # set_routing_table({'10.104.0.2': "10.104.0.1"},"11.2.11.1")
+    # set_routing_table({'10.105.0.2': "10.105.0.1"},"11.3.11.1")
+
+    # initializing sockets for each interface other than loopback
+    listen_sockets = {}
+    router_sockets = {}
+    interfaces = ni.interfaces()
+    # dictionary that map broadcast ip to inet addr
+    broadcast_to_tcp = {}
+    # dictionary the map client/router ip address to a specific socket
+
+    ip_to_intf = {}
+    # Assign some sockets to all interfaces' broadcast IP
+    for intf in interfaces:
+        if intf != 'lo':
+            ip = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
+            listen_sockets[ip] = socket.socket(socket.AF_INET,
+                                               socket.SOCK_DGRAM,
+                                               socket.IPPROTO_UDP)
+            listen_sockets[ip].setsockopt(socket.SOL_SOCKET,
+                                          socket.SO_REUSEADDR, 1)
+            listen_sockets[ip].setsockopt(socket.SOL_SOCKET,
+                                          socket.SO_BINDTODEVICE,
+                                          str(intf).encode('utf-8'))
+            listen_sockets[ip].bind((ip, 9000))
+
+            ip2 = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
+            router_sockets[ip2] = socket.socket(socket.AF_INET,
+                                                    socket.SOCK_STREAM)
+            router_sockets[ip2].setsockopt(socket.SOL_SOCKET,
+                                               socket.SO_REUSEADDR, 1)
+            router_sockets[ip2].setsockopt(socket.SOL_SOCKET,
+                                               socket.SO_BINDTODEVICE,
+                                               str(intf).encode('utf-8'))
+            router_sockets[ip2].bind((ip2, 9000))
+            router_sockets[ip2].listen(5)
+            broadcast_to_tcp[ip] = ip2
+            ip_to_intf[ip2] = intf
+
+    input_sockets = list(listen_sockets.values()) + list(
+        router_sockets.values())
+    print(input_sockets)
+
+    threading.Thread(target=send_and_receive_table).start()
+
+    while True:
+
+        readable, writable, exceptional = select.select(input_sockets,
+                                                        output_sockets,
+                                                        [])
+        for s in readable:
+            if s in router_sockets.values():
+                print("new connection from router come in")
+                new_connection, router_ip = s.accept()
+                new_connection.setsockopt(socket.SOL_SOCKET,
+                                          socket.SO_BINDTODEVICE, str(
+                        ip_to_intf[s.getsockname()[0]]).encode('utf-8'))
+                router_connections[router_ip] = new_connection
+                input_sockets.append(new_connection)
+                output_sockets.append(new_connection)
+                print("router connection:\n")
+                print(router_connections)
