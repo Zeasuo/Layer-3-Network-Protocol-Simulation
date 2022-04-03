@@ -8,9 +8,8 @@ import time
 import select
 
 
-
 """
-    In this function, forwarding table referrs to the table that routers send to the monitor node 
+    In this class, forwarding table referrs to the table that routers send to the monitor node 
     routing table refers to the table that the monitor node sends to the router
 """
 
@@ -24,6 +23,7 @@ routing_table = {}
 computed_routing_table = {}
 # format: {receiving_ip: {destination_ip: {source_interface_ip: next_interface_ip}}}, more details in process_routing_table
 routing_table_to_send = {}
+# connection is a dictionary represents the connection between routers, in both directions
 # format: {source_router: {destination_router: (source_ip, destination_ip)}} e.g. {'r1': {'r2': ('10.104.0.1', '10.104.0.2')}}
 connection = {}
 
@@ -98,43 +98,6 @@ def process_forwarding_table(forwarding_table, source_address):
 
 
 """
-    prepare the routing table to be sent to routers 
-    the package format is:
-    {receiving_ip: {destination_ip: {source_interface_ip: next_interface_ip}}}
-    where receiving_ip is the IP address of the receiving router
-    destination_ip is the IP address of the destination router
-    source_interface_ip is the IP address of the source interface of the receiving router
-    next_interface_ip is the IP address of the router that will forward the packet to the destination router
-"""
-def process_routing_table(currect_router):
-    global routing_table_to_send
-
-    # get receiving router IP, which is source ip but with last digit changed to 2 (e.g. 11.1.11.1 -> 11.1.11.2)
-    for currect_router in routing_table.keys():
-        current_routing_table = computed_routing_table[currect_router]
-        for source_address, router in source_address_to_router.items():
-            if router == currect_router:
-                receiving_ip = source_address[:-1] + "2"
-                routing_table_to_send[receiving_ip] = {}
-                for target_node in current_routing_table:
-                    # get destination router IP
-                    temp_router = currect_router
-                    temp_table = computed_routing_table[temp_router]
-                    while temp_table[target_node] != target_node:
-                        temp_router = temp_table[target_node]
-                        temp_table = computed_routing_table[temp_router]
-                    destination_ip = connection[temp_router][target_node][1]
-
-                    next_node = current_routing_table[target_node]
-                    # get source interface IP
-                    source_interface_ip = connection[currect_router][next_node][0]
-                    # get next interface IP
-                    next_interface_ip = connection[currect_router][next_node][1]
-                    routing_table_to_send[receiving_ip][destination_ip] = {source_interface_ip: next_interface_ip}
-
-    print("Routing table to send: " + str(routing_table_to_send))       
-    
-"""
     implement directed, unweighted dijkstra's algorithm to find shortest path to 
     all nodes in the network given routing_table, and a target_node. default distance to neighbors is 1.
     updates calculated_routing_table of the following format:
@@ -186,8 +149,51 @@ def dijkstra(routing_table):
                 previous[node] = node
         # update computed_routing_table
         computed_routing_table[target_node] = previous
-    print("Computed routing table: " + str(computed_routing_table))
     return 
+
+
+"""
+    prepare the routing table to be sent to routers 
+    the package format is:
+    {receiving_ip: {destination_ip: {source_interface_ip: next_interface_ip}}}
+    where receiving_ip is the IP address of the receiving router
+    destination_ip is the IP address of the destination router
+    source_interface_ip is the IP address of the source interface of the receiving router
+    next_interface_ip is the IP address of the router that will forward the packet to the destination router
+"""
+def process_routing_table(currect_router):
+    global routing_table_to_send
+    # get receiving router IP, which is source ip but with last digit changed to 2 (e.g. 11.1.11.1 -> 11.1.11.2)
+    for currect_router in routing_table.keys():
+        current_routing_table = computed_routing_table[currect_router]
+        for source_address, router in source_address_to_router.items():
+            if router == currect_router:
+                receiving_ip = source_address[:-1] + "2"
+                routing_table_to_send[receiving_ip] = {}
+                for target_node in current_routing_table:
+                    # get destination router IP
+                    temp_router = currect_router
+                    temp_table = computed_routing_table[temp_router]
+                    while temp_table[target_node] != target_node:
+                        temp_router = temp_table[target_node]
+                        temp_table = computed_routing_table[temp_router]
+                    destination_ip = connection[temp_router][target_node][1]
+
+                    next_node = current_routing_table[target_node]
+                    # get source interface IP
+                    source_interface_ip = connection[currect_router][next_node][0]
+                    # get next interface IP
+                    next_interface_ip = connection[currect_router][next_node][1]
+                    routing_table_to_send[receiving_ip][destination_ip] = {source_interface_ip: next_interface_ip}
+
+    
+"""
+    A function that prints the routing table, and calculated_routing_table to the console
+"""
+def print_routing_table():
+    print("Routing table: " + str(routing_table))
+    print("Calculated routing table: " + str(computed_routing_table))
+    print("Routing table to send: " + str(routing_table_to_send))
 
 if __name__ == "__main__":
     set_routing_table({'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"},"11.1.11.1")
