@@ -78,10 +78,9 @@ def send_and_receive_table():
                     # pass the received data into the function
                     set_routing_table(receivedData, sourceAddress[0])
 
-            for s in writable:
+            for s in broadcast:
                 if s.getsockname()[0] in routing_table_to_send:
                     s.sendto(str.encode(json.dumps(routing_table_to_send[s.getsockname()[0]])), (socket_b_ip[s], 8005))
-        time.sleep(5)
 
 
 """
