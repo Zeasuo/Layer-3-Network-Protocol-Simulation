@@ -132,10 +132,11 @@ def get_forwarding_table():
     while True:
         readable, writable, exceptional = select.select(monitor, [], [])
         if readable:
-            received, address = s.recvfrom(1024)
-            data = json.loads(received.decode())
-            print(data)
-            forwarding_table = data
+            for s in readable:
+                received, address = s.recvfrom(1024)
+                data = json.loads(received.decode())
+                print(data)
+                forwarding_table = data
 
 
 if __name__ == "__main__":
