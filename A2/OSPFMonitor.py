@@ -68,7 +68,9 @@ def send_and_receive_table():
         readable, writable, exceptional = select.select(receive_from, broadcasts, [])
         if readable:
             for s in readable:
+                print(s)
                 sourcedata, sourceAddress = s.recvfrom(1024)
+                print(sourcedata)
                 if sourceAddress[0] != bip_to_inet[s.getsockname()[0]]:
                     receivedData = json.loads(sourcedata.decode())
                     print("Received: from "+sourceAddress[0])
