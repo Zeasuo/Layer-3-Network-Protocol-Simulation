@@ -103,7 +103,7 @@ def send_forwarding_table():
             if writable:
                 for s in writable:
                     print(b_ip)
-                    s.sendto(str.encode(json.dumps(forwarding_table)), (b_ip, 8002))
+                    s.sendto(str.encode(json.dumps(neighbor_routers)), (b_ip, 8002))
                 old_neighbor_routers = neighbor_routers
 
 
