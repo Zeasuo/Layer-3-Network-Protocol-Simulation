@@ -49,7 +49,7 @@ def send_and_receive_table():
             broadcast = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
                                       socket.IPPROTO_UDP)
             broadcast.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            broadcast.bind((ip, 9001))
+            broadcast.bind((ip, 8001))
             broadcasts.append(broadcast)
             socket_b_ip[broadcast] = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
 
@@ -59,7 +59,7 @@ def send_and_receive_table():
             receive.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             receive.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE,
                                str(intf).encode('utf-8'))
-            receive.bind((ip_b, 9002))
+            receive.bind((ip_b, 8002))
             receive_from.append(receive)
 
             bip_to_inet[ip_b] = ip
@@ -78,8 +78,8 @@ def send_and_receive_table():
 
                     if sourceAddress[0] not in all_routers:
                         new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        new_socket.bind((bip_to_inet[s.getsockname()[0]], 9005))
-                        new_socket.connect((sourceAddress[0], 9000))
+                        new_socket.bind((bip_to_inet[s.getsockname()[0]], 8005))
+                        new_socket.connect((sourceAddress[0], 8000))
                         input_sockets.append(new_socket)
                         output_sockets.append(new_socket)
                         router_connections.append(new_socket)
@@ -87,7 +87,7 @@ def send_and_receive_table():
         else:
             for s in writable:
                 if s.gotsockname()[0] in routing_table_to_send:
-                    s.sendto(str.encode(json.dumps(routing_table_to_send[s.getsockname()[0]])), (socket_b_ip[s], 9002))
+                    s.sendto(str.encode(json.dumps(routing_table_to_send[s.getsockname()[0]])), (socket_b_ip[s], 8002))
         time.sleep(5)
 
 
@@ -277,7 +277,7 @@ if __name__ == "__main__":
             listen_sockets[ip].setsockopt(socket.SOL_SOCKET,
                                           socket.SO_BINDTODEVICE,
                                           str(intf).encode('utf-8'))
-            listen_sockets[ip].bind((ip, 9000))
+            listen_sockets[ip].bind((ip, 8000))
 
             ip2 = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
             router_sockets[ip2] = socket.socket(socket.AF_INET,
@@ -287,7 +287,7 @@ if __name__ == "__main__":
             router_sockets[ip2].setsockopt(socket.SOL_SOCKET,
                                                socket.SO_BINDTODEVICE,
                                                str(intf).encode('utf-8'))
-            router_sockets[ip2].bind((ip2, 9000))
+            router_sockets[ip2].bind((ip2, 8000))
             router_sockets[ip2].listen(5)
             broadcast_to_tcp[ip] = ip2
             ip_to_intf[ip2] = intf
