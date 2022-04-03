@@ -130,7 +130,7 @@ def get_forwarding_table():
             monitor.append(monitor_socket)
 
     while True:
-        readable, writable, exceptional = select.select(monitor)
+        readable, writable, exceptional = select.select(monitor, [], [])
         if readable:
             received, address = s.recvfrom(1024)
             data = json.loads(received.decode())
@@ -181,6 +181,8 @@ if __name__ == "__main__":
         end_to_end_sockets.values())
 
     threading.Thread(target=get_neighbour).start()
+    threading.Thread(target=get_forwarding_table).start()
+    threading.Thread(target=send_forwarding_table).start()
 
     while True:
 
