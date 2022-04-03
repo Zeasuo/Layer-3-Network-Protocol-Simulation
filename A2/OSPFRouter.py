@@ -56,7 +56,7 @@ def get_neighbour():
                     receivedData = json.loads(sourcedata.decode())
                     print("Received: from " + sourceAddress[0])
                     neighbor_routers[bip_to_inet[s.getsockname()[0]]] = sourceAddress[0]
-                    print(neighbor_routers)
+                    print_forwarding_table()
 
                     if sourceAddress[0] not in nearby_router:
                         new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -71,6 +71,25 @@ def get_neighbour():
                 s.sendto(str.encode(json.dumps('hello there')), (socket_b_ip[s], 9002))
                 time.sleep(5)
         time.sleep(5)
+
+
+def print_forwarding_table():
+    global forwarding_table
+    print("Forwarding Table:")
+    for key in forwarding_table.keys():
+        print(key + ": " + forwarding_table[key][0] + " " + str(forwarding_table[key][1]))
+
+'''
+This function creates a socket to OSPFMonitor and writes the forwarding table to it.
+Only use golable variables forwards_table 
+'''
+
+def send_forwarding_table():
+    pass
+
+
+
+
 
 if __name__ == "__main__":
     # initializing sockets for each interface other than loopback
