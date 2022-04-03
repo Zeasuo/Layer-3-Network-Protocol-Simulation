@@ -58,6 +58,7 @@ if __name__ == "__main__":
     initialize_msg = b'hello'
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    s.socket.setsockopt(socket.SOL_IP, socket.IP_TTL, 0)
     # bind the ip address to the socket with port
     s.bind((ip_address, 9000))
     # send broadcast message
