@@ -26,7 +26,7 @@ if __name__ == "__main__":
             listen_sockets[ip] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             listen_sockets[ip].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             listen_sockets[ip].setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, str(intf).encode('utf-8'))
-            listen_sockets[ip].bind((str(socket.INADDR_BROADCAST), 9000))
+            listen_sockets[ip].bind((ip, 9000))
 
             ip2 = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
             end_to_end_sockets[ip2] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
