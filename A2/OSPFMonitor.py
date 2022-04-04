@@ -102,7 +102,7 @@ def set_routing_table(forwarding_table_to_send, source_address):
     process_forwarding_table(forwarding_table_to_send, source_address)
     dijkstra()
     process_routing_table()
-    #print_routing_table()
+    print_routing_table()
 
 
 """
@@ -193,7 +193,7 @@ def dijkstra():
                 # mark node as visited
                 visited.add(current)
                 # for each neighbor of current node
-                for neighbor in routing_table[current]:
+                for neighbor in routing_table[current]:                 
                     # if neighbor is not visited
                     if neighbor not in visited:
                         # if distance to neighbor is greater than distance to current node + 1
@@ -201,7 +201,12 @@ def dijkstra():
                             # update distance to neighbor
                             distance[neighbor] = distance[current] + 1
                             # update previous node to current node
-                            previous[neighbor] = current
+                            prev = current
+
+                            while prev not in routing_table[target_node] and prev != target_node:
+                                prev = previous[prev]
+
+                            previous[neighbor] = prev
                             # add neighbor to queue
                             queue.append(neighbor)
         # return dictionary of previous node to reach each node
@@ -234,11 +239,6 @@ def process_routing_table():
                 for target_node in current_routing_table:
                     if not current_routing_table[target_node]:
                         continue
-                    print("Routing Table:")
-                    print(routing_table)
-                    print(current_router)
-                    print(target_node)
-                    print(connection)
                     next_node = current_routing_table[target_node]
                     # get source interface IP
                     if current_router not in connection or next_node not in connection[current_router]:
@@ -257,10 +257,12 @@ def print_routing_table():
     print("Routing table to send: " + str(routing_table_to_send))
 
 if __name__ == "__main__":
-    # set_routing_table([{'10.104.0.1': "10.104.0.2"}, []],"11.1.11.1")
-    # set_routing_table([{'10.104.0.2': "10.104.0.1"}, []],"11.2.11.1")
-    # set_routing_table([{'10.105.0.2': "10.105.0.1"}, []],"11.3.11.1")
-    # set_routing_table([{'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"}, []],"11.1.11.1")
-    # set_routing_table([{'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"}, []],"11.4.11.1")
+    # set_routing_table([{'1': "2", "1-5": "5-1"},[]],"11.1.11.1")
+    # set_routing_table([{'2': "1", "2-5": "5-2"}, []],"11.2.11.1")
+    # set_routing_table([{'3': "4", '3-6':"6-3"}, []],"11.3.11.1")
+    # set_routing_table([{'4': "3", "4-5": "5-4"}, []],"11.4.11.1")
+    # set_routing_table([{'5-1': "1-5", "5-2": "2-5", "5-4": "4-5"}, []],"11.5.11.1")
+    # set_routing_table([{'6-3': "3-6"}, []],"11.6.11.1")
+    #set_routing_table([{'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"}, []],"11.4.11.1")
 
     send_and_receive_table()
