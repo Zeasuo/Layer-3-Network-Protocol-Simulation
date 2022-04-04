@@ -2,7 +2,7 @@ import socket
 import threading
 import time
 import select
-import netifaces as ni
+#import netifaces as ni
 import json
 
 
@@ -227,6 +227,8 @@ def process_routing_table():
                 receiving_ip = source_address[:-1] + "2"
                 routing_table_to_send[receiving_ip] = {}
                 for target_node in current_routing_table:
+                    if not current_routing_table[target_node]:
+                        continue
                     # get destination router IP
                     temp_router = current_router
                     temp_table = computed_routing_table[temp_router]
@@ -252,8 +254,9 @@ def print_routing_table():
     print("Routing table to send: " + str(routing_table_to_send))
 
 if __name__ == "__main__":
-    # set_routing_table({'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"},"11.1.11.1")
+    # set_routing_table({'10.104.0.1': "10.104.0.2"},"11.1.11.1")
     # set_routing_table({'10.104.0.2': "10.104.0.1"},"11.2.11.1")
     # set_routing_table({'10.105.0.2': "10.105.0.1"},"11.3.11.1")
+    # set_routing_table({'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"},"11.1.11.1")
 
     send_and_receive_table()
