@@ -240,7 +240,7 @@ def process_routing_table():
                     print(connection)
                     next_node = current_routing_table[target_node]
                     # get source interface IP
-                    if not connection[current_router][next_node][0]:
+                    if current_router not in connection or next_node not in connection[current_router]:
                         continue
                     source_interface_ip = connection[current_router][next_node][0]
                     for host in router_to_hosts[target_node]:
