@@ -32,7 +32,7 @@ if __name__ == "__main__":
         while True:
             message = input("Enter Your Message Here: ")
             destination = input("Input Destination IP Address Here: ")
-            ttl = input("Input TTL Here: ")
+            ttl = int(input("Input TTL Here: "))
             ttl -= 1
             port = 9000
 
