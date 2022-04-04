@@ -21,27 +21,17 @@ router_connections = []
     This function is for this router to receive the forwarding tables from neighbours every 5 seconds,
     and send its own forwarding table to neighbours every 5 seconds.
 """
-def advertise():
+def receive_advertise():
     global input_sockets
     global output_sockets
     global router_connections
-    global old_forwarding_table
     tIntfs = ni.interfaces()
-    broadcasts = []
     receive_from = []
-    socket_b_ip = {}
     nearby_router = []
     bip_to_inet = {}
     for intf in tIntfs:
         if intf != 'lo':
             ip = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
-            broadcast = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
-                                      socket.IPPROTO_UDP)
-            broadcast.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            broadcast.bind((ip, 9001))
-            broadcasts.append(broadcast)
-            socket_b_ip[broadcast] = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
-
             ip_b = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
             receive = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
                                     socket.IPPROTO_UDP)
@@ -54,7 +44,7 @@ def advertise():
             bip_to_inet[ip_b] = ip
 
     while True:
-        readable, writable, exceptional = select.select(receive_from, broadcasts, [])
+        readable, writable, exceptional = select.select(receive_from, [], [])
         if readable:
             for s in readable:
                 sourcedata, sourceAddress = s.recvfrom(1024)
@@ -63,10 +53,9 @@ def advertise():
                     print("Received: from "+sourceAddress[0])
                     print(receivedData)
                     for (key, value) in receivedData.items():
-                        if key not in forwarding_table.keys() \
-                                or (key in forwarding_table.keys() and value[1] + 1 <
-                                    forwarding_table[key][1]):
+                        if key not in forwarding_table.keys() or (key in forwarding_table.keys() and value[1] + 1 < forwarding_table[key][1]):
                             forwarding_table[key] = (sourceAddress[0], value[1] + 1)
+
 
                     if sourceAddress[0] not in nearby_router:
                         new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -76,13 +65,30 @@ def advertise():
                         output_sockets.append(new_socket)
                         router_connections.append(new_socket)
                         nearby_router.append(sourceAddress[0])
-        else:
-            for s in writable:
-                s.sendto(str.encode(json.dumps(forwarding_table)), (socket_b_ip[s], 9002))
-                print("forwarding_table:")
-                print(forwarding_table)
-            time.sleep(5)
 
+def advertise():
+    global input_sockets
+    global output_sockets
+    global router_connections
+    tIntfs = ni.interfaces()
+    broadcasts = []
+    socket_b_ip = {}
+    for intf in tIntfs:
+        if intf != 'lo':
+            ip = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
+            broadcast = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
+                                      socket.IPPROTO_UDP)
+            broadcast.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            broadcast.bind((ip, 9001))
+            broadcasts.append(broadcast)
+            socket_b_ip[broadcast] = ni.ifaddresses(intf)[ni.AF_INET][0]['broadcast']
+
+    while True:
+        readable, writable, exceptional = select.select([], broadcasts, [])
+        for s in writable:
+            s.sendto(str.encode(json.dumps(forwarding_table)), (socket_b_ip[s], 9002))
+            print("forwarding_table:")
+            print(forwarding_table)
 
 if __name__ == "__main__":
     # initializing sockets for each interface other than loopback
@@ -127,6 +133,7 @@ if __name__ == "__main__":
         end_to_end_sockets.values())
     print(input_sockets)
 
+    threading.Thread(target=receive_advertise).start()
     threading.Thread(target=advertise).start()
 
     while True:
