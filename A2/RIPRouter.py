@@ -91,7 +91,7 @@ def advertise():
             s.sendto(str.encode(json.dumps(forwarding_table)), (socket_b_ip[s], 9002))
             print("Forwarding_table: ")
             print(forwarding_table)
-        time.sleep(10)
+        time.sleep(30)
 
 
 if __name__ == "__main__":
