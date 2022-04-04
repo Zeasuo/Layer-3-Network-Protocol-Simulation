@@ -140,14 +140,13 @@ def get_forwarding_table():
                         changed = True
                         forwarding_table[host] = dest
                         t1 = time.time()
-                        print(t1-t0)
                     else:
                         if forwarding_table[host] != dest:
                             changed = True
                             forwarding_table[host] = dest
                             t1 = time.time()
-                            print(t1-t0)
                 if changed:
+                    print(t1-t0)
                     changed = False
                     t0 = t1
 
