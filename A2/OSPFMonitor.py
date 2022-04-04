@@ -234,7 +234,8 @@ def process_routing_table():
                 for target_node in current_routing_table:
                     if not current_routing_table[target_node]:
                         continue
-                    print(current_routing_table)
+                    print("Routing Table:")
+                    print(routing_table)
                     print(current_router)
                     print(target_node)
                     print(connection)
@@ -254,10 +255,10 @@ def print_routing_table():
     print("Routing table to send: " + str(routing_table_to_send))
 
 if __name__ == "__main__":
-    # set_routing_table([{'10.104.0.1': "10.104.0.2"}, ["h1","h2","h3"]],"11.1.11.1")
-    # set_routing_table([{'10.104.0.2': "10.104.0.1"}, ["h4","h5","h6"]],"11.2.11.1")
-    # set_routing_table([{'10.105.0.2': "10.105.0.1"}, ["h7","h8","h9"]],"11.3.11.1")
-    # set_routing_table([{'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"}, ["h1","h2","h3"]],"11.1.11.1")
-    # set_routing_table([{'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"}, ["h1","h2","h3"]],"11.4.11.1")
+    # set_routing_table([{'10.104.0.1': "10.104.0.2"}, []],"11.1.11.1")
+    # set_routing_table([{'10.104.0.2': "10.104.0.1"}, []],"11.2.11.1")
+    # set_routing_table([{'10.105.0.2': "10.105.0.1"}, []],"11.3.11.1")
+    # set_routing_table([{'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"}, []],"11.1.11.1")
+    # set_routing_table([{'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"}, []],"11.4.11.1")
 
     send_and_receive_table()
