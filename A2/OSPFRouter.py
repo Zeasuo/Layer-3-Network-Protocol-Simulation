@@ -90,6 +90,7 @@ Only use golable variables forwards_table
 def send_forwarding_table():
     tIntfs = ni.interfaces()
     global forwarding_table_to_send
+    global old_forwarding_table_to_send 
     b_ip = 0
     send_to = []
     for intf in tIntfs:
