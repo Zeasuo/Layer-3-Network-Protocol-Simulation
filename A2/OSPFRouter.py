@@ -130,7 +130,7 @@ def get_forwarding_table():
                 received, address = s.recvfrom(1024)
                 data = json.loads(received.decode())
                 print(data)
-                forwarding_table += data
+                forwarding_table = data
 
 
 if __name__ == "__main__":
