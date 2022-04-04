@@ -28,6 +28,7 @@ def receive_advertise():
     global router_connections
     global t1, t0
     tIntfs = ni.interfaces()
+    changed = False
     receive_from = []
     nearby_router = []
     bip_to_inet = {}
@@ -55,9 +56,12 @@ def receive_advertise():
                     for (key, value) in receivedData.items():
                         if key not in forwarding_table.keys() or (key in forwarding_table.keys() and value[1] + 1 < forwarding_table[key][1]):
                             forwarding_table[key] = (sourceAddress[0], value[1] + 1)
+                            changed = True
                             t1 = time.time()
                             print(t1-t0)
-                            t0 = t1
+                    if changed:
+                        changed = False
+                        t0 = t1
 
                     if sourceAddress[0] not in nearby_router:
                         new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

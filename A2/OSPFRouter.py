@@ -18,7 +18,8 @@ neighbor_routers = {}
 forwarding_table_to_send = [{}, []]
 # previous version of send_forwarding_table
 old_forwarding_table_to_send = [{}, []]
-
+t0 = None
+t1 = None
 
 def get_neighbour():
     global input_sockets
@@ -114,9 +115,10 @@ def send_forwarding_table():
 
 
 def get_forwarding_table():
-    global forwarding_table
+    global forwarding_table, t0, t1
     interfaces = ni.interfaces()
     monitor = []
+    changed = False
     for intf in interfaces:
         if 'eth10' in intf:
             ip2 = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
@@ -135,12 +137,19 @@ def get_forwarding_table():
                 print(data)
                 for host, dest in data.items():
                     if host not in forwarding_table:
+                        changed = True
                         forwarding_table[host] = dest
+                        t1 = time.time()
+                        print(t1-t0)
                     else:
                         if forwarding_table[host] != dest:
+                            changed = True
                             forwarding_table[host] = dest
-
-
+                            t1 = time.time()
+                            print(t1-t0)
+                if changed:
+                    changed = False
+                    t0 = t1
 
 
 if __name__ == "__main__":
@@ -186,6 +195,7 @@ if __name__ == "__main__":
     input_sockets = list(listen_sockets.values()) + list(
         end_to_end_sockets.values())
 
+    t0 = time.time()
     threading.Thread(target=get_neighbour).start()
     threading.Thread(target=get_forwarding_table).start()
     threading.Thread(target=send_forwarding_table).start()
