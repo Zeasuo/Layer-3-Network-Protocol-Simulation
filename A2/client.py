@@ -33,6 +33,7 @@ if __name__ == "__main__":
             message = input("Enter Your Message Here: ")
             destination = input("Input Destination IP Address Here: ")
             ttl = input("Input TTL Here: ")
+            ttl -= 1
             port = 9000
 
             if destination[:len(destination) - 3] == subnet_address:
