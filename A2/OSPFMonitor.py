@@ -75,7 +75,7 @@ def send_and_receive_table():
                 sourcedata, sourceAddress = s.recvfrom(1024)
                 print(sourcedata)
                 if sourceAddress[0] != bip_to_inet[s.getsockname()[0]]:
-                    all_routers[sourceAddress[:-1] + "2"] = broadcasts_s_to_inet_s[s]
+                    all_routers[sourceAddress[0][:-1] + "2"] = broadcasts_s_to_inet_s[s]
                     receivedData = json.loads(sourcedata.decode())
                     print("Received: from "+sourceAddress[0])
                     print(receivedData)
