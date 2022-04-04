@@ -90,7 +90,7 @@ class StraightOSPFRouter(Topo):
         self.addLink(r3, r4, intfName1='r3-eth2', intftName2='r4-eth1',
                      params1={'ip': '10.109.0.1/24'},
                      params2={'ip': '10.109.0.2/24'})
-        self.addLink(r4, r5, intfName1='r4-eth1', intftName2='r5-eth1',
+        self.addLink(r4, r5, intfName1='r4-eth2', intftName2='r5-eth1',
                      params1={'ip': '10.110.0.1/24'},
                      params2={'ip': '10.110.0.2/24'})
         self.addLink(r5, r6, intfName1='r5-eth2', intftName2='r6-eth1',
