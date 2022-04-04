@@ -26,7 +26,7 @@ def receive_advertise():
     global input_sockets
     global output_sockets
     global router_connections
-    global t1
+    global t1, t0
     tIntfs = ni.interfaces()
     receive_from = []
     nearby_router = []
@@ -52,13 +52,12 @@ def receive_advertise():
                 sourcedata, sourceAddress = s.recvfrom(1024)
                 if sourceAddress[0] != bip_to_inet[s.getsockname()[0]]:
                     receivedData = json.loads(sourcedata.decode())
-                    print("Received: from "+sourceAddress[0])
-                    print(receivedData)
                     for (key, value) in receivedData.items():
                         if key not in forwarding_table.keys() or (key in forwarding_table.keys() and value[1] + 1 < forwarding_table[key][1]):
                             forwarding_table[key] = (sourceAddress[0], value[1] + 1)
                             t1 = time.time()
                             print(t1-t0)
+                            t0 = t1
 
                     if sourceAddress[0] not in nearby_router:
                         new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -90,7 +89,7 @@ def advertise():
         readable, writable, exceptional = select.select([], broadcasts, [])
         for s in writable:
             s.sendto(str.encode(json.dumps(forwarding_table)), (socket_b_ip[s], 9002))
-            print("forwarding_table:")
+            print("Forwarding_table: ")
             print(forwarding_table)
         time.sleep(10)
 
@@ -136,7 +135,6 @@ if __name__ == "__main__":
 
     input_sockets = list(listen_sockets.values()) + list(
         end_to_end_sockets.values())
-    print(input_sockets)
 
     t0 = time.time()
     threading.Thread(target=receive_advertise).start()
@@ -155,7 +153,6 @@ if __name__ == "__main__":
                 s.sendto(str.encode(interface_ip), (address[0], address[1]))
 
             if s in end_to_end_sockets.values():
-                print("new connection come in")
                 new_connection, client_ip = s.accept()
                 new_connection.setsockopt(socket.SOL_SOCKET,
                                           socket.SO_BINDTODEVICE, str(
@@ -163,9 +160,6 @@ if __name__ == "__main__":
                 client_connections[client_ip] = new_connection
                 input_sockets.append(new_connection)
                 output_sockets.append(new_connection)
-                print(client_connections)
-                print(router_connections)
-                print("connection established on ip ", client_ip)
 
             if s in client_connections.values() or s in router_connections:
                 received = s.recv(1024)
