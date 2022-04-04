@@ -43,6 +43,7 @@ def send_and_receive_table():
     socket_b_ip = {}
     all_routers = {}
     bip_to_inet = {}
+    broadcasts_s_to_inet_s ={}
     for intf in tIntfs:
         if intf != 'lo':
             ip = ni.ifaddresses(intf)[ni.AF_INET][0]['addr']
@@ -64,6 +65,8 @@ def send_and_receive_table():
 
             bip_to_inet[ip_b] = ip
 
+            broadcasts_s_to_inet_s[receive] = broadcast
+
     while True:
         readable, writable, exceptional = select.select(receive_from, broadcasts, [])
         if readable:
@@ -72,7 +75,7 @@ def send_and_receive_table():
                 sourcedata, sourceAddress = s.recvfrom(1024)
                 print(sourcedata)
                 if sourceAddress[0] != bip_to_inet[s.getsockname()[0]]:
-                    all_routers[sourceAddress[0]] = s
+                    all_routers[sourceAddress[:-1] + "2"] = broadcasts_s_to_inet_s[s]
                     receivedData = json.loads(sourcedata.decode())
                     print("Received: from "+sourceAddress[0])
                     print(receivedData)
@@ -83,7 +86,7 @@ def send_and_receive_table():
                 print(all_routers)
                 if router_address in routing_table_to_send:
                     print(router_address)
-                    all_routers[router_address].sendto(str.encode(json.dumps(routing_table_to_send[router_address])), (router_address, 8005))
+                    all_routers[router_address].sendto(str.encode(json.dumps(routing_table_to_send[router_address])), (router_address[:-1] + "1", 8005))
 
 
 """
