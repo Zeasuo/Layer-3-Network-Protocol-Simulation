@@ -155,6 +155,7 @@ if __name__ == "__main__":
     # dictionary the map client/router ip address to a specific socket
 
     ip_to_intf = {}
+    myIntf_to_destIntf = {}
     # Assign some sockets to all interfaces' broadcast IP
     for intf in interfaces:
         if intf != 'lo' and 'eth10' not in intf:
@@ -211,6 +212,7 @@ if __name__ == "__main__":
                                           socket.SO_BINDTODEVICE, str(
                         ip_to_intf[s.getsockname()[0]]).encode('utf-8'))
                 client_connections[client_ip] = new_connection
+                myIntf_to_destIntf[s.getsockname()[0]] = client_ip[0]
                 input_sockets.append(new_connection)
                 output_sockets.append(new_connection)
                 print(client_connections)
@@ -231,6 +233,6 @@ if __name__ == "__main__":
                     client_connections[(destination, int(port))].send(str.encode(sent))
                 elif destination in forwarding_table:
                     print("sending to other router")
-                    client_connections[(forwarding_table[destination], 9005)].send(str.encode(sent))
+                    client_connections[(myIntf_to_destIntf[forwarding_table[destination]], 9005)].send(str.encode(sent))
                 else:
                     s.send(str.encode(json.dumps("The destination is unreachable")))
