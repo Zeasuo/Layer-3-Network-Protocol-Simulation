@@ -24,6 +24,7 @@ def get_neighbour():
     global input_sockets
     global output_sockets
     global router_connections
+    global neighbor_routers
     tIntfs = ni.interfaces()
     broadcasts = []
     receive_from = []
