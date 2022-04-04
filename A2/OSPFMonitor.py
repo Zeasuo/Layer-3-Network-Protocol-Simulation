@@ -102,7 +102,7 @@ def set_routing_table(forwarding_table_to_send, source_address):
     process_forwarding_table(forwarding_table_to_send, source_address)
     dijkstra()
     process_routing_table()
-    print_routing_table()
+    #print_routing_table()
 
 
 """
@@ -234,6 +234,10 @@ def process_routing_table():
                 for target_node in current_routing_table:
                     if not current_routing_table[target_node]:
                         continue
+                    print(current_routing_table)
+                    print(current_router)
+                    print(target_node)
+                    print(connection)
                     next_node = current_routing_table[target_node]
                     # get source interface IP
                     source_interface_ip = connection[current_router][next_node][0]
@@ -254,5 +258,6 @@ if __name__ == "__main__":
     # set_routing_table([{'10.104.0.2': "10.104.0.1"}, ["h4","h5","h6"]],"11.2.11.1")
     # set_routing_table([{'10.105.0.2': "10.105.0.1"}, ["h7","h8","h9"]],"11.3.11.1")
     # set_routing_table([{'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"}, ["h1","h2","h3"]],"11.1.11.1")
+    # set_routing_table([{'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"}, ["h1","h2","h3"]],"11.4.11.1")
 
     send_and_receive_table()
