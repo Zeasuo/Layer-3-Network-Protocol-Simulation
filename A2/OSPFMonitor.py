@@ -80,6 +80,7 @@ def send_and_receive_table():
                     set_routing_table(receivedData, sourceAddress[0])
 
             for router_address in all_routers:
+                print(all_routers)
                 if router_address in routing_table_to_send:
                     print(router_address)
                     all_routers[router_address].sendto(str.encode(json.dumps(routing_table_to_send[router_address])), (router_address, 8005))
