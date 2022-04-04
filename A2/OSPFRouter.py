@@ -17,7 +17,7 @@ neighbor_routers = {}
 # forwarding_table_to_send[1] is a list of all host ips this router is connected to 
 forwarding_table_to_send = [{}, []]
 # previous version of send_forwarding_table
-old_forwarding_table_to_send = []
+old_forwarding_table_to_send = [{}, []]
 
 
 def get_neighbour():
