@@ -15,7 +15,8 @@ output_sockets = []
 client_connections = {}
 # The list stores the socket of the neighbour routers.
 router_connections = []
-
+t0 = None
+t1 = None
 
 """
     This function is for this router to receive the forwarding tables from neighbours every 5 seconds,
@@ -25,6 +26,7 @@ def receive_advertise():
     global input_sockets
     global output_sockets
     global router_connections
+    global t1
     tIntfs = ni.interfaces()
     receive_from = []
     nearby_router = []
@@ -55,6 +57,8 @@ def receive_advertise():
                     for (key, value) in receivedData.items():
                         if key not in forwarding_table.keys() or (key in forwarding_table.keys() and value[1] + 1 < forwarding_table[key][1]):
                             forwarding_table[key] = (sourceAddress[0], value[1] + 1)
+                            t1 = time.time()
+                            print(t1-t0)
 
                     if sourceAddress[0] not in nearby_router:
                         new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -89,6 +93,7 @@ def advertise():
             print("forwarding_table:")
             print(forwarding_table)
         time.sleep(10)
+
 
 if __name__ == "__main__":
     # initializing sockets for each interface other than loopback
@@ -133,6 +138,7 @@ if __name__ == "__main__":
         end_to_end_sockets.values())
     print(input_sockets)
 
+    t0 = time.time()
     threading.Thread(target=receive_advertise).start()
     threading.Thread(target=advertise).start()
 
