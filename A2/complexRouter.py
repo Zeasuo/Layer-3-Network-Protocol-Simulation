@@ -12,11 +12,13 @@ input_sockets = []
 output_sockets = []
 client_connections = {}
 router_connections = []
+old_forwarding_table = {}
 
 def advertise():
     global input_sockets
     global output_sockets
     global router_connections
+    global old_forwarding_table
     tIntfs = ni.interfaces()
     broadcasts = []
     receive_from = []
@@ -69,11 +71,12 @@ def advertise():
                         nearby_router.append(sourceAddress[0])
         else:
             for s in writable:
-                s.sendto(str.encode(json.dumps(forwarding_table)), (socket_b_ip[s], 9002))
-
-                print("forwarding_table:")
-                print(forwarding_table)
-                time.sleep(5)
+                if forwarding_table != old_forwarding_table:
+                    s.sendto(str.encode(json.dumps(forwarding_table)), (socket_b_ip[s], 9002))
+                    print("forwarding_table:")
+                    print(forwarding_table)
+            old_forwarding_table = forwarding_table.copy()
+            time.sleep(5)
 
 
 if __name__ == "__main__":
