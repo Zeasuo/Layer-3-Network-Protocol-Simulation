@@ -12,8 +12,12 @@ input_sockets = []
 output_sockets = []
 client_connections = {}
 router_connections = []
-old_neighbor_routers = {}
 neighbor_routers = {}
+# forwarding_table_to_send[0] is a dictionary of the form {'source': 'neighbour}
+# forwarding_table_to_send[1] is a list of all host ips this router is connected to 
+forwarding_table_to_send = []
+# previous version of send_forwarding_table
+old_forwarding_table_to_send = []
 
 
 def get_neighbour():
@@ -56,6 +60,7 @@ def get_neighbour():
                     receivedData = json.loads(sourcedata.decode())
                     print("Received: from " + sourceAddress[0])
                     neighbor_routers[bip_to_inet[s.getsockname()[0]]] = sourceAddress[0]
+                    forwarding_table_to_send[0] = neighbor_routers
                     print_forwarding_table()
 
                     if sourceAddress[0] not in nearby_router:
@@ -83,7 +88,7 @@ Only use golable variables forwards_table
 
 def send_forwarding_table():
     tIntfs = ni.interfaces()
-    global old_neighbor_routers
+    global forwarding_table_to_send
     b_ip = 0
     send_to = []
     for intf in tIntfs:
@@ -98,13 +103,13 @@ def send_forwarding_table():
             send_to.append(monitor_socket)
 
     while True:
-        if old_neighbor_routers != neighbor_routers:
+        if old_forwarding_table_to_send != forwarding_table_to_send:
             readable, writable, exceptional = select.select([], send_to, [])
             if writable:
                 for s in writable:
                     print(b_ip)
-                    s.sendto(str.encode(json.dumps(neighbor_routers)), (b_ip, 8002))
-                old_neighbor_routers = neighbor_routers
+                    s.sendto(str.encode(json.dumps(forwarding_table_to_send)), (b_ip, 8002))
+                old_forwarding_table_to_send = forwarding_table_to_send
 
 
 def get_forwarding_table():
@@ -127,7 +132,14 @@ def get_forwarding_table():
                 received, address = s.recvfrom(1024)
                 data = json.loads(received.decode())
                 print(data)
-                forwarding_table = data
+                for host, dest in data: 
+                    if host not in forwarding_table:
+                        forwarding_table[host] = dest
+                    else:
+                        if forwarding_table[host] != dest:
+                            forwarding_table[host] = dest
+                
+                
 
 
 if __name__ == "__main__":
@@ -185,7 +197,8 @@ if __name__ == "__main__":
             if s.proto == 17:
                 data, address = s.recvfrom(1024)
                 interface_ip = broadcast_to_tcp[s.getsockname()[0]]
-                forwarding_table[address[0]] = (interface_ip, 0)
+                forwarding_table[address[0]] = interface_ip
+                forwarding_table_to_send[1] = list(forwarding_table)
                 s.sendto(str.encode(interface_ip), (address[0], address[1]))
 
             if s in end_to_end_sockets.values():
@@ -215,6 +228,6 @@ if __name__ == "__main__":
                     client_connections[(destination, int(port))].send(str.encode(sent))
                 elif destination in forwarding_table:
                     print("sending to other router")
-                    client_connections[(forwarding_table[destination][0], 9005)].send(str.encode(sent))
+                    client_connections[(forwarding_table[destination], 9005)].send(str.encode(sent))
                 else:
                     s.send(str.encode(json.dumps("The destination is unreachable")))

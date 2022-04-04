@@ -2,7 +2,7 @@ import socket
 import threading
 import time
 import select
-import netifaces as ni
+#import netifaces as ni
 import json
 
 
@@ -19,11 +19,14 @@ source_address_to_router = {} # e.g. {"11.1.11.1": "r1"}
 routing_table = {}
 # format: {node: {target: neighbour}}, e.g. {'r2': {'r1': 'r1', 'r3': 'r1'}}
 computed_routing_table = {}
-# format: {receiving_ip: {destination_ip: {source_interface_ip: next_interface_ip}}}, more details in process_routing_table
+# format: {receiving_ip: {host_ip: source_interface_ip}}, more details in process_routing_table
 routing_table_to_send = {}
 # connection is a dictionary represents the connection between routers, in both directions
 # format: {source_router: {destination_router: (source_ip, destination_ip)}} e.g. {'r1': {'r2': ('10.104.0.1', '10.104.0.2')}}
 connection = {}
+# this maps the router to a list of its hosts
+router_to_hosts = {}
+
 
 input_sockets = []
 output_sockets = []
@@ -95,23 +98,25 @@ def send_and_receive_table():
     calculates the routing table, prepares the routing table in a format that 
     can be sent to other routers.
 """
-def set_routing_table(forwarding_table, source_address):
-    process_forwarding_table(forwarding_table, source_address)
+def set_routing_table(forwarding_table_to_send, source_address):
+    process_forwarding_table(forwarding_table_to_send, source_address)
     dijkstra()
     process_routing_table()
     print_routing_table()
 
 
 """
-    forwarding_table follows the format: {sourceIP: destIP}
+    forwarding_table[0] follows the format: {sourceIP: destIP}
+    forwarding_table[1] is a list of this router's hosts 
     process forwarding_table and updates routing table
 """
-def process_forwarding_table(forwarding_table, source_address):
+def process_forwarding_table(forwarding_table_to_send, source_address):
     global router_count
     global router_to_forwarding_table
     global source_address_to_router
     global routing_table
     global connection
+    forwarding_table = forwarding_table_to_send[0]
     # if it's the first time we've seen this source address
     if source_address not in source_address_to_router:
         router = "r" + str(router_count)
@@ -126,8 +131,9 @@ def process_forwarding_table(forwarding_table, source_address):
         if router_to_forwarding_table[source_address_to_router[source_address]] != forwarding_table:
             # update the forwarding table, and destination IP to source IP mapping
             router_to_forwarding_table[source_address_to_router[source_address]] = forwarding_table
-
     current_router = source_address_to_router[source_address]
+    # add hosts to under the current router
+    router_to_hosts[current_router] = forwarding_table_to_send[1]
     print("Processing current router: " + current_router)
     # update routing table
     for source_ip, dest_ip in forwarding_table.items():
@@ -211,11 +217,10 @@ def dijkstra():
 """
     prepare the routing table to be sent to routers 
     the package format is:
-    {receiving_ip: {destination_ip: {source_interface_ip: next_interface_ip}}}
+    {receiving_ip: {host_ip: source_interface_ip}}
     where receiving_ip is the IP address of the receiving router
     destination_ip is the IP address of the destination router
     source_interface_ip is the IP address of the source interface of the receiving router
-    next_interface_ip is the IP address of the router that will forward the packet to the destination router
 """
 def process_routing_table():
     global routing_table_to_send
@@ -229,20 +234,11 @@ def process_routing_table():
                 for target_node in current_routing_table:
                     if not current_routing_table[target_node]:
                         continue
-                    # get destination router IP
-                    temp_router = current_router
-                    temp_table = computed_routing_table[temp_router]
-                    while temp_table[target_node] != target_node:
-                        temp_router = temp_table[target_node]
-                        temp_table = computed_routing_table[temp_router]
-                    destination_ip = connection[temp_router][target_node][1]
-
                     next_node = current_routing_table[target_node]
                     # get source interface IP
                     source_interface_ip = connection[current_router][next_node][0]
-                    # get next interface IP
-                    next_interface_ip = connection[current_router][next_node][1]
-                    routing_table_to_send[receiving_ip][destination_ip] = {source_interface_ip: next_interface_ip}
+                    for host in router_to_hosts[target_node]:
+                        routing_table_to_send[receiving_ip][host] = source_interface_ip
 
 
 """
@@ -250,13 +246,13 @@ def process_routing_table():
 """
 def print_routing_table():
     print("Routing table: " + str(routing_table))
-    print("Calculated routing table: " + str(computed_routing_table))
+    print("Computed routing table: " + str(computed_routing_table))
     print("Routing table to send: " + str(routing_table_to_send))
 
 if __name__ == "__main__":
-    # set_routing_table({'10.104.0.1': "10.104.0.2"},"11.1.11.1")
-    # set_routing_table({'10.104.0.2': "10.104.0.1"},"11.2.11.1")
-    # set_routing_table({'10.105.0.2': "10.105.0.1"},"11.3.11.1")
-    # set_routing_table({'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"},"11.1.11.1")
+    # set_routing_table([{'10.104.0.1': "10.104.0.2"}, ["h1","h2","h3"]],"11.1.11.1")
+    # set_routing_table([{'10.104.0.2': "10.104.0.1"}, ["h4","h5","h6"]],"11.2.11.1")
+    # set_routing_table([{'10.105.0.2': "10.105.0.1"}, ["h7","h8","h9"]],"11.3.11.1")
+    # set_routing_table([{'10.104.0.1': "10.104.0.2", '10.105.0.1': "10.105.0.2"}, ["h1","h2","h3"]],"11.1.11.1")
 
     send_and_receive_table()
