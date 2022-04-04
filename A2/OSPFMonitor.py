@@ -96,16 +96,15 @@ def send_and_receive_table():
     can be sent to other routers.
 """
 def set_routing_table(forwarding_table, source_address):
-    current_router = process_forwarding_table(forwarding_table, source_address)
-    dijkstra(routing_table)
-    process_routing_table(current_router)
+    process_forwarding_table(forwarding_table, source_address)
+    dijkstra()
+    process_routing_table()
     print_routing_table()
 
 
 """
     forwarding_table follows the format: {sourceIP: destIP}
     process forwarding_table and updates routing table
-    return the node that represents the source address
 """
 def process_forwarding_table(forwarding_table, source_address):
     global router_count
@@ -128,28 +127,28 @@ def process_forwarding_table(forwarding_table, source_address):
             # update the forwarding table, and destination IP to source IP mapping
             router_to_forwarding_table[source_address_to_router[source_address]] = forwarding_table
 
-    currect_router = source_address_to_router[source_address]
-    print("Processing current router: " + currect_router)
+    current_router = source_address_to_router[source_address]
+    print("Processing current router: " + current_router)
     # update routing table
     for source_ip, dest_ip in forwarding_table.items():
         for router in router_to_forwarding_table.keys():
             # if source_ip, dest_ip matches dest_ip, source_ip in forwarding table of another router
             # and store this connection in connection dictionary
-             if router != currect_router \
+             if router != current_router \
                 and dest_ip in router_to_forwarding_table[router] \
                 and router_to_forwarding_table[router][dest_ip] == source_ip \
-                and router not in routing_table[currect_router] and currect_router not in routing_table[router]:
-                routing_table[currect_router].append(router)
-                routing_table[router].append(currect_router)
+                and router not in routing_table[current_router] and current_router not in routing_table[router]:
+                routing_table[current_router].append(router)
+                routing_table[router].append(current_router)
                 # add connection to connection dictionary
-                if currect_router not in connection:
-                    connection[currect_router] = {}
-                connection[currect_router][router] = (source_ip, dest_ip)
+                if current_router not in connection:
+                    connection[current_router] = {}
+                connection[current_router][router] = (source_ip, dest_ip)
                 if router not in connection:
                     connection[router] = {}
-                connection[router][currect_router] = (dest_ip, source_ip)
+                connection[router][current_router] = (dest_ip, source_ip)
                 break
-    return currect_router
+    return
 
 
 """
@@ -159,7 +158,9 @@ def process_forwarding_table(forwarding_table, source_address):
     {node: {target: neighbor}} where node is the current node, target is the node want to reach. 
     and neighbor is the node that is the next hop in order to reach target_node
 """
-def dijkstra(routing_table):
+def dijkstra():
+    global routing_table
+    global computed_routing_table
     for target_node in routing_table:
         # initialize distance to all nodes to infinity
         distance = {}
@@ -179,7 +180,7 @@ def dijkstra(routing_table):
         queue.append(target_node)
         # while queue is not empty
         while queue:
-            # pop node with smallest distance
+            # pop node with the smallest distance
             current = queue.pop(0)
             # if node has not been visited
             if current not in visited:
@@ -216,18 +217,18 @@ def dijkstra(routing_table):
     source_interface_ip is the IP address of the source interface of the receiving router
     next_interface_ip is the IP address of the router that will forward the packet to the destination router
 """
-def process_routing_table(currect_router):
+def process_routing_table():
     global routing_table_to_send
     # get receiving router IP, which is source ip but with last digit changed to 2 (e.g. 11.1.11.1 -> 11.1.11.2)
-    for currect_router in routing_table.keys():
-        current_routing_table = computed_routing_table[currect_router]
+    for current_router in routing_table.keys():
+        current_routing_table = computed_routing_table[current_router]
         for source_address, router in source_address_to_router.items():
-            if router == currect_router:
+            if router == current_router:
                 receiving_ip = source_address[:-1] + "2"
                 routing_table_to_send[receiving_ip] = {}
                 for target_node in current_routing_table:
                     # get destination router IP
-                    temp_router = currect_router
+                    temp_router = current_router
                     temp_table = computed_routing_table[temp_router]
                     while temp_table[target_node] != target_node:
                         temp_router = temp_table[target_node]
@@ -236,9 +237,9 @@ def process_routing_table(currect_router):
 
                     next_node = current_routing_table[target_node]
                     # get source interface IP
-                    source_interface_ip = connection[currect_router][next_node][0]
+                    source_interface_ip = connection[current_router][next_node][0]
                     # get next interface IP
-                    next_interface_ip = connection[currect_router][next_node][1]
+                    next_interface_ip = connection[current_router][next_node][1]
                     routing_table_to_send[receiving_ip][destination_ip] = {source_interface_ip: next_interface_ip}
 
 
