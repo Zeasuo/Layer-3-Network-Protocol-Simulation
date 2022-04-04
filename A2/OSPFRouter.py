@@ -112,7 +112,7 @@ def send_forwarding_table():
                 for s in writable:
                     print(b_ip)
                     s.sendto(str.encode(json.dumps(forwarding_table_to_send)), (b_ip, 8002))
-                old_forwarding_table_to_send = forwarding_table_to_send
+                old_forwarding_table_to_send = forwarding_table_to_send.copy()
 
 
 def get_forwarding_table():
