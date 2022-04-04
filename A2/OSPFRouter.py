@@ -20,6 +20,7 @@ def get_neighbour():
     global input_sockets
     global output_sockets
     global router_connections
+    global neighbor_routers
     tIntfs = ni.interfaces()
     broadcasts = []
     receive_from = []
@@ -84,6 +85,7 @@ Only use golable variables forwards_table
 def send_forwarding_table():
     tIntfs = ni.interfaces()
     global old_neighbor_routers
+    global neighbor_routers
     b_ip = 0
     send_to = []
     for intf in tIntfs:
@@ -128,7 +130,7 @@ def get_forwarding_table():
                 received, address = s.recvfrom(1024)
                 data = json.loads(received.decode())
                 print(data)
-                forwarding_table = data
+                forwarding_table += data
 
 
 if __name__ == "__main__":
