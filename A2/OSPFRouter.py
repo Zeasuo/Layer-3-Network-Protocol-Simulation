@@ -229,9 +229,9 @@ if __name__ == "__main__":
                 port = data['port']
                 data['ttl'] = ttl
                 sent = json.dumps(data)
-                if (destination, int(port)) in client_connections:
+                if (destination, int(port)) in client_connections and ttl > 0:
                     client_connections[(destination, int(port))].send(str.encode(sent))
-                elif destination in forwarding_table:
+                elif destination in forwarding_table and ttl > 0:
                     print("sending to other router")
                     client_connections[(myIntf_to_destIntf[forwarding_table[destination]], 9005)].send(str.encode(sent))
                 else:
