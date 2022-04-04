@@ -77,7 +77,6 @@ def get_neighbour():
             for s in writable:
                 s.sendto(str.encode(json.dumps('hello there')), (socket_b_ip[s], 9002))
                 time.sleep(5)
-        time.sleep(5)
 
 
 def print_forwarding_table():

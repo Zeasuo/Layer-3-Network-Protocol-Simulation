@@ -74,7 +74,6 @@ def advertise():
                 print("forwarding_table:")
                 print(forwarding_table)
                 time.sleep(5)
-        time.sleep(5)
 
 
 if __name__ == "__main__":
