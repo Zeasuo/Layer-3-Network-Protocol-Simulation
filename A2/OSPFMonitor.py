@@ -73,23 +73,17 @@ def send_and_receive_table():
     while True:
         readable, writable, exceptional = select.select(receive_from, broadcasts, [])
         if readable:
-            print(readable)
             for s in readable:
 
                 sourcedata, sourceAddress = s.recvfrom(1024)
-                print(sourcedata)
                 if sourceAddress[0] != bip_to_inet[s.getsockname()[0]]:
                     all_routers[sourceAddress[0][:-1] + "2"] = broadcasts_s_to_inet_s[s]
                     receivedData = json.loads(sourcedata.decode())
-                    print("Received: from "+sourceAddress[0])
-                    print(receivedData)
                     # pass the received data into the function
                     set_routing_table(receivedData, sourceAddress[0])
 
             for router_address in all_routers:
-                print(routing_table_to_send)
                 if router_address in routing_table_to_send:
-                    print(router_address)
                     all_routers[router_address].sendto(str.encode(json.dumps(routing_table_to_send[router_address])), (router_address[:-1] + "1", 8005))
 
 
@@ -193,7 +187,7 @@ def dijkstra():
                 # mark node as visited
                 visited.add(current)
                 # for each neighbor of current node
-                for neighbor in routing_table[current]:                 
+                for neighbor in routing_table[current]:
                     # if neighbor is not visited
                     if neighbor not in visited:
                         # if distance to neighbor is greater than distance to current node + 1
