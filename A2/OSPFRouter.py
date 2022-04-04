@@ -14,7 +14,7 @@ client_connections = {}
 router_connections = []
 neighbor_routers = {}
 # forwarding_table_to_send[0] is a dictionary of the form {'source': 'neighbour}
-# forwarding_table_to_send[1] is a list of all host ips this router is connected to 
+# forwarding_table_to_send[1] is a list of all host ips this router is connected to
 forwarding_table_to_send = [{}, []]
 # previous version of send_forwarding_table
 old_forwarding_table_to_send = [{}, []]
@@ -60,7 +60,6 @@ def get_neighbour():
                 sourcedata, sourceAddress = s.recvfrom(1024)
                 if sourceAddress[0] != bip_to_inet[s.getsockname()[0]]:
                     receivedData = json.loads(sourcedata.decode())
-                    print("Received: from " + sourceAddress[0])
                     neighbor_routers[bip_to_inet[s.getsockname()[0]]] = sourceAddress[0]
                     forwarding_table_to_send[0] = neighbor_routers
                     print_forwarding_table()
@@ -82,15 +81,16 @@ def get_neighbour():
 def print_forwarding_table():
     print("Forwarding Table:")
     print(forwarding_table)
+
+
 '''
 This function creates a socket to OSPFMonitor and writes the forwarding table to it.
 Only use golable variables forwards_table 
 '''
-
 def send_forwarding_table():
     tIntfs = ni.interfaces()
     global forwarding_table_to_send
-    global old_forwarding_table_to_send 
+    global old_forwarding_table_to_send
     b_ip = 0
     send_to = []
     for intf in tIntfs:
@@ -109,7 +109,6 @@ def send_forwarding_table():
             readable, writable, exceptional = select.select([], send_to, [])
             if writable:
                 for s in writable:
-                    print(b_ip)
                     s.sendto(str.encode(json.dumps(forwarding_table_to_send)), (b_ip, 8002))
                 old_forwarding_table_to_send = forwarding_table_to_send.copy()
 
@@ -140,8 +139,8 @@ def get_forwarding_table():
                     else:
                         if forwarding_table[host] != dest:
                             forwarding_table[host] = dest
-                
-                
+
+
 
 
 if __name__ == "__main__":
@@ -205,7 +204,6 @@ if __name__ == "__main__":
                 s.sendto(str.encode(interface_ip), (address[0], address[1]))
 
             if s in end_to_end_sockets.values():
-                print("new connection come in")
                 new_connection, client_ip = s.accept()
                 new_connection.setsockopt(socket.SOL_SOCKET,
                                           socket.SO_BINDTODEVICE, str(
@@ -214,9 +212,6 @@ if __name__ == "__main__":
                 myIntf_to_destIntf[s.getsockname()[0]] = client_ip[0]
                 input_sockets.append(new_connection)
                 output_sockets.append(new_connection)
-                print(client_connections)
-                print(router_connections)
-                print("connection established on ip ", client_ip)
 
             if s in client_connections.values() or s in router_connections:
                 received = s.recv(1024)
