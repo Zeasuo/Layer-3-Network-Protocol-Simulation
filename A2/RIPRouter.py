@@ -6,14 +6,21 @@ import netifaces as ni
 import select
 import json
 
+# forwading_table
 forwarding_table = {}
 # sockets that should be input or output to
 input_sockets = []
 output_sockets = []
+# The dictionary stores the information about client/host in format {(client_ip, port number):socket_connection}.
 client_connections = {}
+# The list stores the socket of the neighbour routers.
 router_connections = []
-old_forwarding_table = {}
 
+
+"""
+    This function is for this router to receive the forwarding tables from neighbours every 5 seconds,
+    and send its own forwarding table to neighbours every 5 seconds.
+"""
 def advertise():
     global input_sockets
     global output_sockets
@@ -71,11 +78,9 @@ def advertise():
                         nearby_router.append(sourceAddress[0])
         else:
             for s in writable:
-                if forwarding_table != old_forwarding_table:
-                    s.sendto(str.encode(json.dumps(forwarding_table)), (socket_b_ip[s], 9002))
-                    print("forwarding_table:")
-                    print(forwarding_table)
-            old_forwarding_table = forwarding_table.copy()
+                s.sendto(str.encode(json.dumps(forwarding_table)), (socket_b_ip[s], 9002))
+                print("forwarding_table:")
+                print(forwarding_table)
             time.sleep(5)
 
 
