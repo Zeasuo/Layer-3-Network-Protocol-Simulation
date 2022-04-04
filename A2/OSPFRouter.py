@@ -135,7 +135,7 @@ def get_forwarding_table():
                 received, address = s.recvfrom(1024)
                 data = json.loads(received.decode())
                 print(data)
-                for host, dest in data: 
+                for host, dest in data.items():
                     if host not in forwarding_table:
                         forwarding_table[host] = dest
                     else:
