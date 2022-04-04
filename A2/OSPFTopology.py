@@ -34,7 +34,7 @@ class OSPF(Topo):
         h2 = self.addHost('h2', ip='10.1.0.252/24')
         h3 = self.addHost('h3', ip="10.100.0.251/24", defaultRoute='via 10.100.0.1')
         h4 = self.addHost('h4', ip="10.100.0.252/24", defaultRoute='via 10.100.0.1')
-        m0 = self.addHost('m0', ip="11.1.0.1/24")
+        m0 = self.addHost('m0', ip="11.1.11.2/24")
         s1 = self.addSwitch('s1')
         s2 = self.addSwitch('s2')
 
