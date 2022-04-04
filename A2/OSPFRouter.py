@@ -200,7 +200,7 @@ if __name__ == "__main__":
                 data, address = s.recvfrom(1024)
                 interface_ip = broadcast_to_tcp[s.getsockname()[0]]
                 forwarding_table[address[0]] = interface_ip
-                forwarding_table_to_send[1] = list(forwarding_table)
+                forwarding_table_to_send.append(list(forwarding_table.keys()))
                 s.sendto(str.encode(interface_ip), (address[0], address[1]))
 
             if s in end_to_end_sockets.values():
