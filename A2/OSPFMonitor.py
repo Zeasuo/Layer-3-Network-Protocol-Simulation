@@ -2,7 +2,7 @@ import socket
 import threading
 import time
 import select
-#import netifaces as ni
+import netifaces as ni
 import json
 
 
