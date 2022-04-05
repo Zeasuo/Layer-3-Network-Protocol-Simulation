@@ -63,6 +63,8 @@ def receive_advertise():
                             t1 = time.time()
                             print(t1-t0)
                     if changed:
+                        print("Forwarding_table: ")
+                        print(forwarding_table)
                         changed = False
                         t0 = t1
 
@@ -99,8 +101,6 @@ def advertise():
         readable, writable, exceptional = select.select([], broadcasts, [])
         for s in writable:
             s.sendto(str.encode(json.dumps(forwarding_table)), (socket_b_ip[s], 9002))
-            print("Forwarding_table: ")
-            print(forwarding_table)
         time.sleep(1)
 
 
@@ -161,6 +161,8 @@ if __name__ == "__main__":
                 interface_ip = broadcast_to_tcp[s.getsockname()[0]]
                 forwarding_table[address[0]] = (interface_ip, 0)
                 s.sendto(str.encode(interface_ip), (address[0], address[1]))
+                print("Forwarding_table (added host): ")
+                print(forwarding_table)
 
             if s in end_to_end_sockets.values():
                 new_connection, client_ip = s.accept()
