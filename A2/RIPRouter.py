@@ -18,10 +18,6 @@ router_connections = []
 t0 = None
 t1 = None
 
-"""
-    This function is for this router to receive the forwarding tables from neighbours every 5 seconds,
-    and send its own forwarding table to neighbours every 5 seconds.
-"""
 def receive_advertise():
     global input_sockets
     global output_sockets
