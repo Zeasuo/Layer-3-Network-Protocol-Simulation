@@ -69,13 +69,15 @@ class ComplexRouter(Topo):
         # links between routers
         routers = [r1, r2, r3, r4, r5]
         start = 0
+        intf = 11
         for r in routers:
             for y in range(start+1, 5):
-                self.addLink(r, routers[start+1], intfName1=r + "-eth" + str(y),
-                             intftName2=routers[start+1] + "-eth" + str(y),
-                             params1={'ip': '11.' + str(start+1) + '.11.1/24'},
-                             params2={'ip': '11.' + str(start+1) + '.11.2/24'})
+                self.addLink(r, routers[start+1], intfName1=r + "-eth" + str(intf),
+                             intftName2=routers[start+1] + "-eth" + str(intf),
+                             params1={'ip': '12.' + str(start+1) + '.11.1/24'},
+                             params2={'ip': '12.' + str(start+1) + '.11.2/24'})
             start += 1
+            intf += 1
 
         # links to monitor node
         intf_ip = 1
