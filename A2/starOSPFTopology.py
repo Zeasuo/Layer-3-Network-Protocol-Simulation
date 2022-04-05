@@ -1,6 +1,7 @@
 from mininet.topo import Topo
 
-class StraightOSPFRouter(Topo):
+
+class ComplexRouter(Topo):
     """
         A multi-router network topology to test basic functionality of router broadcasting and advertising
         r1 = u  s1  h1
@@ -50,38 +51,31 @@ class StraightOSPFRouter(Topo):
         self.addLink(h1, s1)
 
         # r2 network links
-        self.addLink(s2, r2, intfName2='r2-eth0',
-                     params2={'ip': '10.101.0.1/24'})
+        self.addLink(s2, r2, intfName2='r2-eth0', params2={'ip': '10.101.0.1/24'})
         self.addLink(h2, s2)
 
         # r3 network links
-        self.addLink(s3, r3, intfName2='r3-eth0',
-                     params2={'ip': '10.103.0.1/24'})
+        self.addLink(s3, r3, intfName2='r3-eth0', params2={'ip': '10.103.0.1/24'})
         self.addLink(h3, s3)
 
         # r4 network links
-        self.addLink(s4, r4, intfName2='r4-eth0',
-                     params2={'ip': '10.104.0.1/24'})
+        self.addLink(s4, r4, intfName2='r4-eth0', params2={'ip': '10.104.0.1/24'})
         self.addLink(h4, s4)
 
         # r5 network links
-        self.addLink(s5, r5, intfName2='r5-eth0',
-                     params2={'ip': '10.105.0.1/24'})
+        self.addLink(s5, r5, intfName2='r5-eth0', params2={'ip': '10.105.0.1/24'})
         self.addLink(h5, s5)
 
         # links between routers
-        self.addLink(r1, r2, intfName1='r1-eth1', intftName2='r2-eth1',
-                     params1={'ip': '10.107.0.1/24'},
-                     params2={'ip': '10.107.0.2/24'})
-        self.addLink(r2, r3, intfName1='r2-eth2', intftName2='r3-eth1',
-                     params1={'ip': '10.108.0.1/24'},
-                     params2={'ip': '10.108.0.2/24'})
-        self.addLink(r3, r4, intfName1='r3-eth2', intftName2='r4-eth1',
-                     params1={'ip': '10.109.0.1/24'},
-                     params2={'ip': '10.109.0.2/24'})
-        self.addLink(r4, r5, intfName1='r4-eth2', intftName2='r5-eth1',
-                     params1={'ip': '10.110.0.1/24'},
-                     params2={'ip': '10.110.0.2/24'})
+        routers = [r1, r2, r3, r4, r5]
+        start = 1
+        for r in routers:
+            for y in range(start, 6):
+                self.addLink(r, routers[start], intfName1=r + "-eth" + str(y),
+                             intftName2=routers[start] + "-eth" + str(y),
+                             params1={'ip': '11.' + str(start) + '.11.1/24'},
+                             params2={'ip': '11.' + str(start) + '.11.2/24'})
+            start += 1
 
         # links to monitor node
         intf_ip = 1
@@ -95,5 +89,5 @@ class StraightOSPFRouter(Topo):
             intf_ip += 1
 
 
-topos = {'straightOSPF': (lambda: StraightOSPFRouter())}
+topos = {'star': (lambda: ComplexRouter())}
 

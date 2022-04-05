@@ -8,7 +8,6 @@ class StraightRouter(Topo):
         r3 = w  s3  h3
         r4 = x  s4  h4
         r5 = y  s5  h5
-        r6 = z  s6  h6
         The ip address of hosts and interfaces in this topology is static.
     """
 
@@ -42,11 +41,6 @@ class StraightRouter(Topo):
         h5 = self.addHost('h5', ip="10.105.0.251/24")
         s5 = self.addSwitch('s5')
 
-        # r6 network host
-        r6 = self.addHost('r6', ip='10.106.0.1/24')
-        h6 = self.addHost('h6', ip="10.106.0.251/24")
-        s6 = self.addSwitch('s6')
-
         # Add links based on the above diagram
         # r1 network links
         self.addLink(s1, r1, intfName2='r1-eth0', params2={'ip': '10.1.0.1/24'})
@@ -72,11 +66,6 @@ class StraightRouter(Topo):
                      params2={'ip': '10.105.0.1/24'})
         self.addLink(h5, s5)
 
-        # r6 network links
-        self.addLink(s6, r6, intfName2='r6-eth0',
-                     params2={'ip': '10.106.0.1/24'})
-        self.addLink(h6, s6)
-
         # links between routers
         self.addLink(r1, r2, intfName1='r1-eth1', intftName2='r2-eth1',
                      params1={'ip': '10.107.0.1/24'},
@@ -90,9 +79,7 @@ class StraightRouter(Topo):
         self.addLink(r4, r5, intfName1='r4-eth2', intftName2='r5-eth1',
                      params1={'ip': '10.110.0.1/24'},
                      params2={'ip': '10.110.0.2/24'})
-        self.addLink(r5, r6, intfName1='r5-eth2', intftName2='r6-eth1',
-                     params1={'ip': '10.111.0.1/24'},
-                     params2={'ip': '10.111.0.2/24'})
 
 
 topos = {'straight': (lambda: StraightRouter())}
+
