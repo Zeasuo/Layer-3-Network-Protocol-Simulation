@@ -18,6 +18,13 @@ router_connections = []
 t0 = None
 t1 = None
 
+"""
+This function receives forwarding tables from neighbor routers and updates the
+router's forwarding table based on received data. 
+Example:
+received: {h1: (xxx.xxx.xxx.xxx, 0)} from interface yyy.yyy.yyy.yyy
+updates: {... h1: (yyy.yyy.yyy.yyy, 1)}
+"""
 def receive_advertise():
     global input_sockets
     global output_sockets
@@ -67,7 +74,10 @@ def receive_advertise():
                         output_sockets.append(new_socket)
                         router_connections.append(new_socket)
                         nearby_router.append(sourceAddress[0])
-
+"""
+This function broadcasts the router's forwarding table to neighbor routers every
+30 seconds. The format of the forwarding table is {destination: (interface_to_send, distance to the destination)...}
+"""
 def advertise():
     global input_sockets
     global output_sockets
