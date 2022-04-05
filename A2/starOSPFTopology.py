@@ -74,8 +74,8 @@ class ComplexRouter(Topo):
             for y in range(start+1, 5):
                 self.addLink(r, routers[start+1], intfName1=r + "-eth" + str(intf),
                              intftName2=routers[start+1] + "-eth" + str(intf),
-                             params1={'ip': '12.' + str(start+1) + '.11.1/24'},
-                             params2={'ip': '12.' + str(start+1) + '.11.2/24'})
+                             params1={'ip': '12.' + str(intf+1) + '.11.1/24'},
+                             params2={'ip': '12.' + str(intf+1) + '.11.2/24'})
             start += 1
             intf += 1
 
