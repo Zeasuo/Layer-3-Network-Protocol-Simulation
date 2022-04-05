@@ -101,7 +101,7 @@ def advertise():
         readable, writable, exceptional = select.select([], broadcasts, [])
         for s in writable:
             s.sendto(str.encode(json.dumps(forwarding_table)), (socket_b_ip[s], 9002))
-        time.sleep(1)
+        time.sleep(30)
 
 
 if __name__ == "__main__":
@@ -161,6 +161,7 @@ if __name__ == "__main__":
                 interface_ip = broadcast_to_tcp[s.getsockname()[0]]
                 forwarding_table[address[0]] = (interface_ip, 0)
                 s.sendto(str.encode(interface_ip), (address[0], address[1]))
+                t0 = t1
                 print("Forwarding_table (added host): ")
                 print(forwarding_table)
 

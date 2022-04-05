@@ -63,7 +63,6 @@ def get_neighbour():
                     receivedData = json.loads(sourcedata.decode())
                     neighbor_routers[bip_to_inet[s.getsockname()[0]]] = sourceAddress[0]
                     forwarding_table_to_send[0] = neighbor_routers
-                    print_forwarding_table()
 
                     if sourceAddress[0] not in nearby_router:
                         new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -149,6 +148,8 @@ def get_forwarding_table():
                     print(t1-t0)
                     changed = False
                     t0 = t1
+                    print("Forwarding_table: ")
+                    print(forwarding_table)
 
 
 if __name__ == "__main__":
@@ -211,6 +212,9 @@ if __name__ == "__main__":
                 forwarding_table[address[0]] = interface_ip
                 forwarding_table_to_send[1] = list(forwarding_table.keys())
                 s.sendto(str.encode(interface_ip), (address[0], address[1]))
+                t0 = t1
+                print("Forwarding_table (added host): ")
+                print(forwarding_table)
 
             if s in end_to_end_sockets.values():
                 new_connection, client_ip = s.accept()
