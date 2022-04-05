@@ -66,18 +66,36 @@ class ComplexRouter(Topo):
         self.addLink(s5, r5, intfName2='r5-eth0', params2={'ip': '10.105.0.1/24'})
         self.addLink(h5, s5)
 
-        # links between routers
-        routers = [r1, r2, r3, r4, r5]
-        start = 0
-        intf = 11
-        for r in routers:
-            for y in range(start+1, 5):
-                self.addLink(r, routers[start+1], intfName1=r + "-eth" + str(intf),
-                             intftName2=routers[start+1] + "-eth" + str(intf),
-                             params1={'ip': '12.' + str(intf+1) + '.11.1/24'},
-                             params2={'ip': '12.' + str(intf+1) + '.11.2/24'})
-            start += 1
-            intf += 1
+        self.addLink(r1, r2, intfName1='r1-eth1', intftName2='r2-eth1',
+                     params1={'ip': '10.107.0.1/24'},
+                     params2={'ip': '10.107.0.2/24'})
+        self.addLink(r1, r3, intfName1='r1-eth2', intftName2='r3-eth1',
+                     params1={'ip': '10.108.0.1/24'},
+                     params2={'ip': '10.108.0.2/24'})
+        self.addLink(r1, r4, intfName1='r1-eth3', intftName2='r4-eth1',
+                     params1={'ip': '10.109.0.1/24'},
+                     params2={'ip': '10.109.0.2/24'})
+        self.addLink(r1, r5, intfName1='r1-eth4', intftName2='r5-eth1',
+                     params1={'ip': '10.110.0.1/24'},
+                     params2={'ip': '10.110.0.2/24'})
+        self.addLink(r2, r3, intfName1='r2-eth2', intftName2='r3-eth2',
+                     params1={'ip': '10.111.0.1/24'},
+                     params2={'ip': '10.111.0.2/24'})
+        self.addLink(r2, r4, intfName1='r2-eth3', intftName2='r4-eth2',
+                     params1={'ip': '10.112.0.1/24'},
+                     params2={'ip': '10.112.0.2/24'})
+        self.addLink(r2, r5, intfName1='r2-eth4', intftName2='r5-eth2',
+                     params1={'ip': '10.113.0.1/24'},
+                     params2={'ip': '10.113.0.2/24'})
+        self.addLink(r3, r4, intfName1='r3-eth3', intftName2='r4-eth3',
+                     params1={'ip': '10.114.0.1/24'},
+                     params2={'ip': '10.114.0.2/24'})
+        self.addLink(r3, r5, intfName1='r3-eth4', intftName2='r5-eth3',
+                     params1={'ip': '10.115.0.1/24'},
+                     params2={'ip': '10.115.0.2/24'})
+        self.addLink(r4, r5, intfName1='r4-eth4', intftName2='r5-eth4',
+                     params1={'ip': '10.116.0.1/24'},
+                     params2={'ip': '10.116.0.2/24'})
 
         # links to monitor node
         intf_ip = 1
