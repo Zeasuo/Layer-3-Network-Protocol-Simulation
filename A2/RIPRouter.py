@@ -161,7 +161,10 @@ if __name__ == "__main__":
                 interface_ip = broadcast_to_tcp[s.getsockname()[0]]
                 forwarding_table[address[0]] = (interface_ip, 0)
                 s.sendto(str.encode(interface_ip), (address[0], address[1]))
-                t0 = t1
+                if t1 is not None:
+                    t0 = t1
+                else:
+                    t0 = time.time()
                 print("Forwarding_table (added host): ")
                 print(forwarding_table)
 
